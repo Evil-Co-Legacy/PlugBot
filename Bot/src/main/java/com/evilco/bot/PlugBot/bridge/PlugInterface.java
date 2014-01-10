@@ -6,6 +6,8 @@ import com.evilco.bot.PlugBot.core.constant.UserStatus;
 import com.evilco.bot.PlugBot.core.data.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
@@ -19,6 +21,11 @@ import java.util.List;
 public class PlugInterface {
 
 	/**
+	 * Caches the bot ID.
+	 */
+	protected String botID = null;
+
+	/**
 	 * Stores the used web driver.
 	 */
 	protected WebDriver driver = null;
@@ -29,12 +36,19 @@ public class PlugInterface {
 	protected Gson gson = null;
 
 	/**
+	 * Stores the interface logger.
+	 */
+	protected Logger log = null;
+
+	/**
 	 * Constructs a new PlugInterface.
 	 * @param driver
 	 */
 	public PlugInterface (WebDriver driver) {
 		this.driver = driver;
 		this.gson = new Gson ();
+
+		this.log = LogManager.getLogger (this.getClass ().getName ());
 	}
 
 	/**
@@ -97,7 +111,29 @@ public class PlugInterface {
 		return this.gson.fromJson (data, (new TypeToken<List<PlugUser>> () { }).getType ());
 	}
 
+	/**
+	 * Returns the bot account ID.
+	 * @return
+	 */
+	public String GetBotID () {
+		if (this.botID == null) {
+			this.botID = this.GetUser ().id;
+			this.log.info ("The bot account ID is {}.", this.botID);
+		}
+
+		return this.botID;
+	}
+
 	// TODO: Missing function getBannedUsers (): The implementation seems to be not done yet (hacky).
+
+	/**
+	 * Returns the current bot username.
+	 * @return
+	 */
+	public String GetCurrentUsername () {
+		// get data from API
+		return ((String) this.GetJavascriptExecutor ().executeScript ("return API.getUser().username;"));
+	}
 
 	/**
 	 * Returns the current DJ.
