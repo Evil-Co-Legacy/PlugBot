@@ -2,6 +2,7 @@ package com.evilco.bot.PlugBot;
 
 import com.evilco.bot.PlugBot.authentication.GoogleAuthenticator;
 import com.evilco.bot.PlugBot.authentication.IAuthenticator;
+import com.evilco.bot.PlugBot.bridge.PlugInterface;
 import com.evilco.bot.PlugBot.core.Platform;
 import com.evilco.bot.PlugBot.core.configuration.Configuration;
 import com.evilco.bot.PlugBot.core.configuration.ConfigurationException;
@@ -75,6 +76,11 @@ public class Bot {
 	 * Stores the plugin manager instance.
 	 */
 	protected PluginManager pluginManager = null;
+
+	/**
+	 * Stores the current plug.dj interface (used to unify plug.dj APIs in Java).
+	 */
+	protected PlugInterface plugInterface = null;
 
 	/**
 	 * The log interface.
@@ -181,6 +187,14 @@ public class Bot {
 	}
 
 	/**
+	 * Returns the current plug interface instance.
+	 * @return
+	 */
+	public PlugInterface GetInterface () {
+		return this.plugInterface;
+	}
+
+	/**
 	 * Returns the current plugin manager instance.
 	 * @return
 	 */
@@ -239,6 +253,9 @@ public class Bot {
 
 		// create event manager
 		this.eventManager = new EventManager (this);
+
+		// create interface
+		this.plugInterface = new PlugInterface (this.currentDriver);
 
 		// request plug.dj
 		this.currentDriver.get (PLUG_URL);
