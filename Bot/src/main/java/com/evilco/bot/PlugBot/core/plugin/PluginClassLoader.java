@@ -140,8 +140,8 @@ public class PluginClassLoader extends URLClassLoader {
 	/**
 	 * Initializes the plugin.
 	 */
-	public void Initialize (Bot bot) {
+	public void Initialize (Bot bot, File configurationFile) {
 		// initialize plugin
-		this.plugin.Initialize (bot, this.pluginMetadata, this.file);
+		this.plugin.Initialize (bot, this.pluginMetadata, this.file, configurationFile);
 	}
 }

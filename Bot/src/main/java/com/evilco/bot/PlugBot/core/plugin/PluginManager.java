@@ -17,6 +17,11 @@ import java.util.Map;
 public class PluginManager {
 
 	/**
+	 * Defines the plugin configuration directory.
+	 */
+	public static final String CONFIG_DIRECTORY = "config";
+
+	/**
 	 * Defines which directory is used to store plugins.
 	 */
 	public static final String PLUGIN_DIRECTORY = "plugins";
@@ -40,6 +45,29 @@ public class PluginManager {
 
 		// construct plugin map
 		this.pluginMap = new HashMap<String, PluginClassLoader> ();
+	}
+
+	/**
+	 * Returns the current configuration directory.
+	 * @return
+	 */
+	public File GetConfigurationDirectory () {
+		File directory = new File (CONFIG_DIRECTORY);
+
+		// check whether directory has been created already
+		if (!directory.exists ()) directory.mkdirs ();
+
+		// return
+		return directory;
+	}
+
+	/**
+	 * Returns the file object for a plugin configuration.
+	 * @param name
+	 * @return
+	 */
+	protected File GetConfigurationFile (String name) {
+		return (new File (this.GetConfigurationDirectory (), name + ".xml"));
 	}
 
 	/**
@@ -72,7 +100,7 @@ public class PluginManager {
 	public void Initialize () {
 		// initialize all plugins
 		for (Map.Entry<String, PluginClassLoader> pluginEntry : this.pluginMap.entrySet ()) {
-			pluginEntry.getValue ().Initialize (this.bot);
+			pluginEntry.getValue ().Initialize (this.bot, this.GetConfigurationFile (pluginEntry.getKey ()));
 			pluginEntry.getValue ().GetPlugin ().OnEnable ();
 
 			// log

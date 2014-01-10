@@ -18,6 +18,11 @@ public abstract class AbstractPlugin implements IPlugin {
 	private Bot bot = null;
 
 	/**
+	 * Stores the suggest configuration file.
+	 */
+	private File configurationFile = null;
+
+	/**
 	 * Stores the plugin file.
 	 */
 	private File file = null;
@@ -38,11 +43,33 @@ public abstract class AbstractPlugin implements IPlugin {
 	/**
 	 * {@inheritDoc}
 	 */
+	public File GetConfigurationFile () {
+		return this.configurationFile;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Plugin GetMetadata () {
+		return this.metadata;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public File GetFile () {
+		return this.file;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void Initialize (Bot bot, Plugin metadata, File pluginFile) {
+	public void Initialize (Bot bot, Plugin metadata, File pluginFile, File configurationFile) {
 		this.bot = bot;
 		this.metadata = metadata;
 		this.file = pluginFile;
+		this.configurationFile = configurationFile;
 	}
 
 	/**
