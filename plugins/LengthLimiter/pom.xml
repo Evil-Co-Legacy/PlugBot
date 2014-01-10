@@ -4,7 +4,7 @@
 
 	<!-- Artifact Information -->
 	<groupId>com.evilco.bot.PlugBot.plugins</groupId>
-	<artifactId>LenghtLimiter</artifactId>
+	<artifactId>LengthLimiter</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
 	<!-- Artifact Metadata -->
