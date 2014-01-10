@@ -9,7 +9,9 @@ public enum UserStatus {
 	AVAILABLE (0),
 	AFK (1),
 	WORKING (2),
-	GAMING (3);
+	GAMING (3),
+
+	UNKNOWN (-1);
 
 	/**
 	 * Stores the numeric representation of the status.
@@ -34,6 +36,6 @@ public enum UserStatus {
 			if (status.numeric == numeric) return status; // TODO: This might be a lot better if we'd use maps ...
 		}
 
-		return null;
+		return UserStatus.UNKNOWN;
 	}
 }
