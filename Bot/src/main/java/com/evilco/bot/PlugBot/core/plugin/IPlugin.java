@@ -1,6 +1,7 @@
 package com.evilco.bot.PlugBot.core.plugin;
 
 import com.evilco.bot.PlugBot.Bot;
+import com.evilco.bot.PlugBot.core.plugin.annotation.Plugin;
 
 import java.io.File;
 
@@ -20,14 +21,11 @@ public interface IPlugin {
 
 	/**
 	 * Initializes the plugin.
-	 * @param loader
-	 * @param name
-	 * @param description
-	 * @param version
-	 * @param author
+	 * @param bot
+	 * @param metadata
 	 * @param pluginFile
 	 */
-	public void Initialize (Bot bot, String name, String description, String version, String author, File pluginFile);
+	public void Initialize (Bot bot, Plugin metadata, File pluginFile);
 
 	/**
 	 * Event handler which occurs when a plugin is enabled.
