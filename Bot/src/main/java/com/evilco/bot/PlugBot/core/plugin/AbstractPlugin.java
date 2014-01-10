@@ -2,7 +2,12 @@ package com.evilco.bot.PlugBot.core.plugin;
 
 import com.evilco.bot.PlugBot.Bot;
 import com.evilco.bot.PlugBot.core.plugin.annotation.Plugin;
+import com.evilco.bot.PlugBot.core.plugin.exception.PluginConfigurationException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
 /**
@@ -73,6 +78,28 @@ public abstract class AbstractPlugin implements IPlugin {
 	}
 
 	/**
+	 * Loads a configuration file.
+	 * @param type
+	 * @param <T>
+	 * @return
+	 * @throws PluginConfigurationException
+	 */
+	public <T> T LoadConfiguration (Class<T> type) throws PluginConfigurationException {
+		try {
+			// create context
+			JAXBContext context = JAXBContext.newInstance (type);
+
+			// create unmarshaller
+			Unmarshaller unmarshaller = context.createUnmarshaller ();
+
+			// unmarshal object from file
+			return ((T) unmarshaller.unmarshal (this.configurationFile));
+		} catch (JAXBException ex) {
+			throw new PluginConfigurationException (ex);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -83,4 +110,24 @@ public abstract class AbstractPlugin implements IPlugin {
 	 */
 	@Override
 	public void OnDisable () { }
+
+	/**
+	 * Saves a configuration file.
+	 * @param configuration
+	 * @throws PluginConfigurationException
+	 */
+	public void SaveConfiguration (Object configuration) throws PluginConfigurationException {
+		try {
+			// create context
+			JAXBContext context = JAXBContext.newInstance (configuration.getClass ());
+
+			// create marshaller
+			Marshaller marshaller = context.createMarshaller ();
+
+			// marshal object to file
+			marshaller.marshal (configuration, this.configurationFile);
+		} catch (JAXBException ex) {
+			throw new PluginConfigurationException (ex);
+		}
+	}
 }
