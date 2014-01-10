@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Artifact Information -->
+	<groupId>com.evilco.bot</groupId>
+	<artifactId>PlugBot</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<!-- Artifact Metadata -->
+	<name>PlugBot</name>
+	<description>An advanced bot implementation for plug.dj.</description>
+
+	<!-- Set Parent -->
+	<parent>
+		<groupId>com.evilco.bot.PlugBot</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../Parent</relativePath>
+	</parent>
+
+	<!-- Build properties -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Selenium Configuration -->
+		<selenium.version>2.39.0</selenium.version>
+		<selenium.driver.firefoxVersion>2.37.1</selenium.driver.firefoxVersion>
+		<selenium.driver.chromeVersion>2.37.1</selenium.driver.chromeVersion>
+
+		<!-- Signing Configuration -->
+		<signing.keyStore>${basedir}../evilco-keystore</signing.keyStore>
+		<signing.password>changeit</signing.password>
+		<signing.alias>evilco-commercial</signing.alias>
+	</properties>
+
+	<!-- Build Dependencies -->
+	<dependencies>
+		<!-- Selenium Core -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+
+		<!-- Firefox -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>${selenium.driver.firefoxVersion}</version>
+		</dependency>
+
+		<!-- Chrome -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+			<version>${selenium.driver.chromeVersion}</version>
+		</dependency>
+
+		<!-- Commons -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<!-- Reflection -->
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.9-RC1</version>
+		</dependency>
+
+		<!-- GSON -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+
+		<!-- Xerces -->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xerces</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+		<!-- Log4j -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>
+	</dependencies>
+
+	<!-- Build Setup -->
+	<build>
+		<!-- Output name -->
+		<finalName>PlugBot-${project.version}</finalName>
+
+		<!-- Goal Configuration -->
+		<defaultGoal>clean install</defaultGoal>
+
+		<!-- Directory Configuration -->
+		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+
+		<!-- Resources -->
+		<resources>
+			<!-- . -->
+			<resource>
+				<directory>${basedir}/../</directory>
+				<targetPath>.</targetPath>
+
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+
+			<!-- /resources/ -->
+			<resource>
+				<directory>${project.build.sourceDirectory}/../resources/</directory>
+				<targetPath>/resources/</targetPath>
+
+				<includes>
+					<include>log4j2.xml</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<!-- Build Plugins -->
+		<plugins>
+			<!-- Java Compiler -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+			</plugin>
+
+			<!-- JAR Creation -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+
+				<!-- JAR Configuration -->
+				<configuration>
+					<archive>
+						<!-- Store Maven Metadata -->
+						<addMavenDescriptor>true</addMavenDescriptor>
+
+						<!-- Setup Manifest -->
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+
+							<!-- Define Entry Poing -->
+							<mainClass>com.evilco.bot.PlugBot.Bot</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Build Profiles -->
+	<profiles>
+		<!-- JAR Signing -->
+		<profile>
+			<id>release</id>
+
+			<!-- Configure additional plugins -->
+			<build>
+				<plugins>
+					<!-- JAR Signing -->
+					<plugin>
+						<artifactId>org.apache.maven.plugins</artifactId>
+						<groupId>maven-jarsigner-plugin</groupId>
+						<version>1.2</version>
+
+						<!-- Configure Execution -->
+						<executions>
+							<execution>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+
+						<!-- Configure Plugin -->
+						<configuration>
+							<keystore>${signing.keyStore}</keystore>
+							<alias>${signing.alias}</alias>
+							<storepass>${signing.password}</storepass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
