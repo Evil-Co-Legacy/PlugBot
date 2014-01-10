@@ -11,6 +11,6 @@
 
 	<modules>
 		<module>Bot</module>
-		<module>plugins/LenghtLimiter</module>
+		<module>plugins/LengthLimiter</module>
 	</modules>
 </project>
