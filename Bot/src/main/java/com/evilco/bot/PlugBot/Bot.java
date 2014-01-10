@@ -3,6 +3,7 @@ package com.evilco.bot.PlugBot;
 import com.evilco.bot.PlugBot.authentication.GoogleAuthenticator;
 import com.evilco.bot.PlugBot.authentication.IAuthenticator;
 import com.evilco.bot.PlugBot.bridge.PlugInterface;
+import com.evilco.bot.PlugBot.command.CommandManager;
 import com.evilco.bot.PlugBot.core.Platform;
 import com.evilco.bot.PlugBot.core.configuration.Configuration;
 import com.evilco.bot.PlugBot.core.configuration.ConfigurationException;
@@ -13,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -46,6 +48,11 @@ public class Bot {
 	 * Stores the path to internal resources.
 	 */
 	public static final String RESOURCE_PATH = "/resources/";
+
+	/**
+	 * Stores the current command manager.
+	 */
+	protected CommandManager commandManager = null;
 
 	/**
 	 * Stores the application configuration.
@@ -171,6 +178,14 @@ public class Bot {
 	}
 
 	/**
+	 * Returns the currently used command manager.
+	 * @return
+	 */
+	public CommandManager GetCommandManager () {
+		return this.commandManager;
+	}
+
+	/**
 	 * Returns the currently used driver.
 	 * @return
 	 */
@@ -250,6 +265,12 @@ public class Bot {
 			// create new driver
 			this.currentDriver = new ChromeDriver ();
 		}
+
+		// setup driver properties
+		this.currentDriver.manage ().window ().setSize (new Dimension (1280, 720));
+
+		// create command manager
+		this.commandManager = new CommandManager (this);
 
 		// create event manager
 		this.eventManager = new EventManager (this);

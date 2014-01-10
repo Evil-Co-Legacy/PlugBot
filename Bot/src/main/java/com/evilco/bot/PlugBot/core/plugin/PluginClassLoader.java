@@ -1,6 +1,7 @@
 package com.evilco.bot.PlugBot.core.plugin;
 
 import com.evilco.bot.PlugBot.Bot;
+import com.evilco.bot.PlugBot.command.ICommandListener;
 import com.evilco.bot.PlugBot.core.event.IListener;
 import com.evilco.bot.PlugBot.core.plugin.annotation.Plugin;
 import org.reflections.Reflections;
@@ -102,13 +103,38 @@ public class PluginClassLoader extends URLClassLoader {
 				// register listener
 				bot.GetEventManager ().RegisterListener (listener, this.plugin);
 			} catch (NoSuchMethodException ex) {
-				bot.log.warn ("The listener " + clazz.getName () + " could not be initialized automatically. No constructor accepts one parameter of type IPlugin.");
+				bot.log.warn ("The listener {} could not be initialized automatically. No constructor accepts one parameter of type IPlugin.", clazz.getName ());
 			} catch (IllegalAccessException ex) {
-				bot.log.warn ("The listener " + clazz.getName () + " could not be initialized automatically. The constructor is protected from external calls.");
+				bot.log.warn ("The listener {} could not be initialized automatically. The constructor is protected from external calls.", clazz.getName ());
 			} catch (InstantiationException ex) {
-				bot.log.warn ("The listener " + clazz.getName () + " could not be initialized automatically. An instantiation of the class failed.");
+				bot.log.warn ("The listener {} could not be initialized automatically. An instantiation of the class failed.", clazz.getName ());
 			} catch (InvocationTargetException ex) {
-				bot.log.warn ("The listener " + clazz.getName () + " could not be initialized automatically. An instantiation of the class failed.");
+				bot.log.warn ("The listener {} could not be initialized automatically. An instantiation of the class failed.", clazz.getName ());
+			}
+		}
+
+		// search for command listeners and register them
+		Set<Class<? extends ICommandListener>> commandListeners = reflections.getSubTypesOf (ICommandListener.class);
+
+		// check classes
+		for (Class<? extends ICommandListener> clazz : commandListeners) {
+			// create new instance
+			try {
+				Constructor<? extends ICommandListener> constructor = clazz.getConstructor (IPlugin.class);
+
+				// call constructor
+				ICommandListener listener = constructor.newInstance (this.plugin);
+
+				// register listener
+				bot.GetCommandManager ().RegisterListener (listener, this.plugin);
+			} catch (NoSuchMethodException ex) {
+				bot.log.warn ("The listener {} could not be initialized automatically. No constructor accepts one parameter of type IPlugin.", clazz.getName ());
+			} catch (IllegalAccessException ex) {
+				bot.log.warn ("The listener {} could not be initialized automatically. The constructor is protected from external calls.", clazz.getName ());
+			} catch (InstantiationException ex) {
+				bot.log.warn ("The listener {} could not be initialized automatically. An instantiation of the class failed.", clazz.getName ());
+			} catch (InvocationTargetException ex) {
+				bot.log.warn ("The listener {} could not be initialized automatically. An instantiation of the class failed.", clazz.getName ());
 			}
 		}
 	}

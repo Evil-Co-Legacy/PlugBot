@@ -1,6 +1,8 @@
 package com.evilco.bot.PlugBot.core.event;
 
 import com.evilco.bot.PlugBot.Bot;
+import com.evilco.bot.PlugBot.command.ICommandSender;
+import com.evilco.bot.PlugBot.command.sender.PlugCommandSender;
 import com.evilco.bot.PlugBot.core.data.HistoryItem;
 import com.evilco.bot.PlugBot.core.data.PlugUser;
 import com.evilco.bot.PlugBot.core.data.PlugVotes;
@@ -74,6 +76,43 @@ public class EventManager {
 	 * @param event
 	 */
 	public void FireEvent (IEvent event) {
+		// command parser
+		if (event instanceof ChatEvent) {
+			ChatEvent chatEvent = ((ChatEvent) event);
+
+			// check whether we're getting our own event
+			if (chatEvent.fromID.equalsIgnoreCase (this.bot.GetInterface ().GetBotID ())) {
+				this.bot.log.debug ("Ignoring our own message: {}", chatEvent.message);
+				return;
+			}
+
+			// check message type
+			if (chatEvent.type.equalsIgnoreCase ("mention")) {
+				// cut down message
+				String command = chatEvent.message;
+
+				// remove @Bot
+				command = command.substring (command.indexOf (" "));
+
+				// get user
+				PlugUser user = this.bot.GetInterface ().GetUser (chatEvent.fromID);
+
+				// catch errors
+				if (user == null) {
+					this.bot.log.warn ("Could not process command for user {} in time.", chatEvent.from);
+					this.bot.log.warn ("This usually happens when a user logs off before the events can be polled. No net to worry yet!");
+					return;
+				}
+
+				// create command sender
+				ICommandSender commandSender = new PlugCommandSender (user, this.bot.GetInterface ());
+
+				// dispatch
+				this.bot.GetCommandManager ().Dispatch (commandSender, command);
+				return;
+			}
+		}
+
 		// iterate over methods
 		for (Map.Entry<Method, Class<? extends IEvent>> listenEntry : this.methodMap.entrySet ()) {
 			// check whether the event matches
