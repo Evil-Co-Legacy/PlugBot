@@ -5,6 +5,7 @@ import com.evilco.bot.PlugBot.core.event.IListener;
 import com.evilco.bot.PlugBot.core.plugin.annotation.Plugin;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -49,7 +50,8 @@ public class PluginClassLoader extends URLClassLoader {
 		this.file = file;
 
 		// create reflections instance
-		Reflections reflections = new Reflections (ClasspathHelper.forClassLoader (this));
+		Reflections reflections = new Reflections (new ConfigurationBuilder ().setUrls(ClasspathHelper.forClassLoader(this)).addClassLoader (this));
+
 
 		// get annotations
 		Set<Class<?>> plugins = reflections.getTypesAnnotatedWith (Plugin.class);
