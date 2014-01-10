@@ -14,6 +14,10 @@ public enum PermissionLevel {
 	HOST (5),
 	AMBASSADOR (8),
 	ADMIN (10),
+
+	CONSOLE (9001),
+	INTERNAL (18000),
+
 	UNKNOWN (-1);
 
 	/**
@@ -39,6 +43,6 @@ public enum PermissionLevel {
 			if (permissionLevel.level == level) return permissionLevel; // TODO: This might be a lot better if we'd use maps ...
 		}
 
-		return null;
+		return PermissionLevel.UNKNOWN;
 	}
 }
