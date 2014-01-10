@@ -131,8 +131,8 @@
 
 			<!-- /resources/ -->
 			<resource>
-				<directory>${project.build.sourceDirectory}/../resources/</directory>
-				<targetPath>/resources/</targetPath>
+				<directory>${basedir}/src/main/resources</directory>
+				<targetPath>resources/</targetPath>
 
 				<includes>
 					<include>log4j2.xml</include>
