@@ -427,7 +427,7 @@ public class Bot {
 		} catch (Exception ex) {
 			// write to log (if available)
 			try {
-				instance.log.error ("The bot has crashed. A restart has been queued to restore the correct application state.");
+				instance.log.error ("The bot has crashed. A restart has been queued to restore the correct application state.", ex);
 			} catch (Exception e) { }
 
 			// create dump fileName
@@ -438,14 +438,33 @@ public class Bot {
 			dateFormat.setTimeZone (timeZone);
 			dumpFile.append (dateFormat.format (new Date ()));
 
-			// write crash dumb
+			// write crash dump
+			FileWriter fileWriter = null;
+			PrintWriter printWriter = null;
+
 			try {
-				FileWriter fileWriter = new FileWriter (dumpFile.toString (), true);
-				PrintWriter printWriter = new PrintWriter (fileWriter);
+				fileWriter = new FileWriter (dumpFile.toString (), true);
+				printWriter = new PrintWriter (fileWriter);
 
 				// write exception
 				ex.printStackTrace (printWriter);
-			} catch (IOException e) { }
+
+				// flush
+				printWriter.flush ();
+				fileWriter.flush ();
+			} catch (IOException e) {
+				try {
+					instance.log.error ("Could not write crash dump to file.", e);
+				} catch (Exception ignore) { }
+			} finally {
+				try {
+					printWriter.close ();
+				} catch (Exception e) { }
+
+				try {
+					fileWriter.close ();
+				} catch (Exception e) { }
+			}
 
 			// write log (if available)
 			try {
