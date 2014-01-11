@@ -22,6 +22,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * @package com.evilco.bot.PlugBot
@@ -411,13 +415,56 @@ public class Bot {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// create new bot instance
-		instance = new Bot (args);
+		try {
+			// create new bot instance
+			instance = new Bot (args);
 
-		// go into normal processing mode
-		instance.Start ();
+			// go into normal processing mode
+			instance.Start ();
 
-		// enter poll mode
-		instance.Listen ();
+			// enter poll mode
+			instance.Listen ();
+		} catch (Exception ex) {
+			// write to log (if available)
+			try {
+				instance.log.error ("The bot has crashed. A restart has been queued to restore the correct application state.");
+			} catch (Exception e) { }
+
+			// create dump fileName
+			StringBuilder dumpFile = new StringBuilder ("crash-");
+
+			TimeZone timeZone = TimeZone.getTimeZone("UTC");
+			DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			dateFormat.setTimeZone (timeZone);
+			dumpFile.append (dateFormat.format (new Date ()));
+
+			// write crash dumb
+			try {
+				FileWriter fileWriter = new FileWriter (dumpFile.toString (), true);
+				PrintWriter printWriter = new PrintWriter (fileWriter);
+
+				// write exception
+				ex.printStackTrace (printWriter);
+			} catch (IOException e) { }
+
+			// write log (if available)
+			try {
+				instance.log.error ("Restarting ...");
+			} catch (Exception e) { }
+
+			// delete instance
+			try {
+				instance.Shutdown ();
+			} catch (Exception e) { }
+
+			// completely delete it
+			instance = null;
+
+			// queue garbage collection
+			System.gc ();
+
+			// try to restart application (until Java kills us)
+			main (args);
+		}
 	}
 }
