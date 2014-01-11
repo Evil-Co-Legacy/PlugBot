@@ -12,5 +12,6 @@
 	<modules>
 		<module>Bot</module>
 		<module>plugins/LengthLimiter</module>
+		<module>plugins/HistoryCheck</module>
 	</modules>
 </project>
