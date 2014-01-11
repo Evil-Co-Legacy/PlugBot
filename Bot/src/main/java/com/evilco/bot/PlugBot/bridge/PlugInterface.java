@@ -8,8 +8,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -343,6 +345,11 @@ public class PlugInterface {
 	 */
 	public void ModerateForceSkip () {
 		this.GetJavascriptExecutor ().executeScript ("API.moderateForceSkip ()");
+
+		// sleep for a few seconds to prevent major problems with plug
+		try {
+			Thread.sleep (300);
+		} catch (Exception ex) { }
 	}
 
 	/**
@@ -436,5 +443,29 @@ public class PlugInterface {
 	 */
 	public void SetVolume (float value) {
 		this.GetJavascriptExecutor ().executeScript ("API.setVolume (arguments[0]);", (value * 100));
+	}
+
+	/**
+	 * Grabs a track.
+	 */
+	public void VoteCurate () {
+		WebElement voteElement = this.driver.findElement (By.id ("curate"));
+		voteElement.click ();
+	}
+
+	/**
+	 * Votes positive.
+	 */
+	public void VoteNegative () {
+		WebElement voteElement = this.driver.findElement (By.id ("meh"));
+		voteElement.click ();
+	}
+
+	/**
+	 * Votes positive.
+	 */
+	public void VotePositive () {
+		WebElement voteElement = this.driver.findElement (By.id ("woot"));
+		voteElement.click ();
 	}
 }
