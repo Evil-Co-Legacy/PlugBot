@@ -36,7 +36,7 @@ public class LengthLimiterPlugin extends AbstractPlugin {
 		try {
 			this.configuration = this.LoadConfiguration (LengthLimiterConfiguration.class);
 		} catch (PluginConfigurationException ex) {
-			this.GetLog ().warn ("Cannot read plugin configuration file.", ex);
+			this.GetLog ().warn ("Cannot read plugin configuration file.");
 
 			try {
 				this.configuration = new LengthLimiterConfiguration ();

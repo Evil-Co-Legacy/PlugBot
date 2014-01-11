@@ -36,7 +36,7 @@ public class UserGreetPlugin extends AbstractPlugin {
 		try {
 			this.configuration = this.LoadConfiguration (UserGreetConfiguration.class);
 		} catch (PluginConfigurationException ex) {
-			this.GetLog ().warn ("Cannot read plugin configuration file.", ex);
+			this.GetLog ().warn ("Cannot read plugin configuration file.");
 
 			try {
 				this.configuration = new UserGreetConfiguration ();
