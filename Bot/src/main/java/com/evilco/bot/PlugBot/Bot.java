@@ -139,6 +139,9 @@ public class Bot {
 			throw new RuntimeException ("An empty configuration file is being used.");
 		}
 
+		// create event manager
+		this.eventManager = new EventManager (this);
+
 		// start plugin manager
 		this.pluginManager = new PluginManager (this);
 	}
@@ -271,9 +274,6 @@ public class Bot {
 
 		// create command manager
 		this.commandManager = new CommandManager (this);
-
-		// create event manager
-		this.eventManager = new EventManager (this);
 
 		// create interface
 		this.plugInterface = new PlugInterface (this.currentDriver);
