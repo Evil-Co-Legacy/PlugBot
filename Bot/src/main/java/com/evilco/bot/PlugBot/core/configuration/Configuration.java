@@ -5,12 +5,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @package com.evilco.bot.PlugBot.core
@@ -24,25 +21,28 @@ public class Configuration {
 	 * Stores account information.
 	 */
 	@XmlElement (name = "account")
-	public ConfigurationAccount account = new ConfigurationAccount ();
+	public ConfigurationAccount account;
+
+	/**
+	 * Stores database configuration properties.
+	 */
+	@XmlElement (name = "database")
+	public ConfigurationDatabase database;
 
 	/**
 	 * Stores system configuration properties.
 	 */
 	@XmlElement (name = "system")
-	public ConfigurationSystem system = new ConfigurationSystem ();
-
-	/**
-	 * Stores a list of enabled plugins.
-	 */
-	@XmlElementWrapper (name = "plugins")
-	@XmlElement (name = "plugin")
-	public List<String> plugins = new ArrayList<String> ();
+	public ConfigurationSystem system;
 
 	/**
 	 * Creates a new instance of Configuration.
 	 */
-	protected Configuration () { }
+	protected Configuration () {
+		this.account = new ConfigurationAccount ();
+		this.database = new ConfigurationDatabase ();
+		this.system = new ConfigurationSystem ();
+	}
 
 	/**
 	 * Saves a configuration file back to disk.
@@ -165,6 +165,37 @@ public class Configuration {
 		 * Constructs a new ConfigurationAccount.
 		 */
 		protected ConfigurationAccount () { }
+	}
+
+	/**
+	 * Storage class for database details.
+	 */
+	@XmlType (name = "database")
+	public static class ConfigurationDatabase {
+
+		/**
+		 * Enables or disable the database API.
+		 */
+		@XmlElement (name = "enableDatabase")
+		public boolean enableDatabase = false;
+
+		/**
+		 * Defines the JDBC url to use.
+		 */
+		@XmlElement (name = "url")
+		public String url = "jdbc:mysql://localhost/plugbot";
+
+		/**
+		 * Defines the database username.
+		 */
+		@XmlElement (name = "username")
+		public String username = "plugbot";
+
+		/**
+		 * Defines the database password.
+		 */
+		@XmlElement (name = "password")
+		public String password = "potato";
 	}
 
 	/**
