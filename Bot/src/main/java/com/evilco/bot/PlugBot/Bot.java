@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.*;
 
@@ -250,9 +251,14 @@ public class Bot {
 		this.pluginManager.LoadPlugins ();
 
 		// create proper driver
-		if (this.configuration.system.driver.equalsIgnoreCase ("firefox"))
-			this.currentDriver = new FirefoxDriver ();
-		else if (this.configuration.system.driver.equalsIgnoreCase ("chrome")) {
+		if (this.configuration.system.driver.equalsIgnoreCase ("firefox")) {
+			// construct capability
+			DesiredCapabilities capabilities = DesiredCapabilities.firefox ();
+			capabilities.setJavascriptEnabled (true);
+
+			// load driver
+			this.currentDriver = new FirefoxDriver (capabilities);
+		} else if (this.configuration.system.driver.equalsIgnoreCase ("chrome")) {
 			// load binary
 			switch (GetPlatform ()) {
 				case WINDOWS:
@@ -265,8 +271,12 @@ public class Bot {
 					break;
 			}
 
+			// construct capability
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome ();
+			capabilities.setJavascriptEnabled (true);
+
 			// create new driver
-			this.currentDriver = new ChromeDriver ();
+			this.currentDriver = new ChromeDriver (capabilities);
 		}
 
 		// setup driver properties
