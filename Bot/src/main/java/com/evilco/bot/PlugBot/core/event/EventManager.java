@@ -279,8 +279,8 @@ public class EventManager {
 						event = new UserLeaveEvent (userLeaveUser);
 						break;
 					case USER_SKIP:
-						PlugUser userSkipUser = this.gson.fromJson (data, PlugUser.class);
-						event = new UserSkipEvent (userSkipUser);
+						String userSkipUsername = this.gson.fromJson (data, String.class);
+						event = new UserSkipEvent (userSkipUsername);
 						break;
 					case VOTE_SKIP:
 						event = new VoteSkipEvent ();

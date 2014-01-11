@@ -1,6 +1,5 @@
 package com.evilco.bot.PlugBot.core.event.user;
 
-import com.evilco.bot.PlugBot.core.data.PlugUser;
 import com.evilco.bot.PlugBot.core.event.IEvent;
 
 /**
@@ -13,13 +12,13 @@ public class UserSkipEvent implements IEvent {
 	/**
 	 * The user who skipped.
 	 */
-	public PlugUser user = null;
+	public String username = null;
 
 	/**
 	 * Constructs a new UserSkipEvent.
 	 * @param user
 	 */
-	public UserSkipEvent (PlugUser user) {
-		this.user = user;
+	public UserSkipEvent (String username) {
+		this.username = username;
 	}
 }
