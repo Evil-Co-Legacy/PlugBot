@@ -13,5 +13,6 @@
 		<module>Bot</module>
 		<module>plugins/LengthLimiter</module>
 		<module>plugins/HistoryCheck</module>
+		<module>plugins/AutoWoot</module>
 	</modules>
 </project>
