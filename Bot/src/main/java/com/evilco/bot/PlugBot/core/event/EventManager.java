@@ -134,7 +134,7 @@ public class EventManager {
 		}
 
 		// log
-		this.bot.log.trace ("Fired event {}.", event.getClass ().getName ());
+		this.bot.log.debug ("Fired event {}.", event.getClass ().getName ());
 	}
 
 	/**
