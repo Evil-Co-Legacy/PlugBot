@@ -20,7 +20,7 @@ public class PlugMedia {
 	/**
 	 * The media duration in seconds.
 	 */
-	public int duration;
+	public double duration;
 
 	/**
 	 * ??? (1 = YouTube, 2/0 = SoundCloud)
