@@ -11,8 +11,10 @@
 
 	<modules>
 		<module>Bot</module>
-		<module>plugins/LengthLimiter</module>
-		<module>plugins/HistoryCheck</module>
+		
 		<module>plugins/AutoWoot</module>
+		<module>plugins/HistoryCheck</module>
+		<module>plugins/LengthLimiter</module>
+		<module>plugins/UserGreet</module>
 	</modules>
 </project>
