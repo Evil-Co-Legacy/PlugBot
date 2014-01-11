@@ -142,6 +142,10 @@ public abstract class AbstractPlugin implements IPlugin {
 			// create marshaller
 			Marshaller marshaller = context.createMarshaller ();
 
+			// set properties
+			marshaller.setProperty (Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			marshaller.setProperty (Marshaller.JAXB_ENCODING, "UTF-8");
+
 			// marshal object to file
 			marshaller.marshal (configuration, this.configurationFile);
 		} catch (JAXBException ex) {
