@@ -2,6 +2,7 @@ package com.evilco.bot.PlugBot.core.plugin;
 
 import com.evilco.bot.PlugBot.Bot;
 import com.evilco.bot.PlugBot.core.plugin.annotation.Plugin;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
@@ -23,6 +24,12 @@ public interface IPlugin {
 	 * @return
 	 */
 	public File GetConfigurationFile ();
+
+	/**
+	 * Returns the plugin log provider.
+	 * @return
+	 */
+	public Logger GetLog ();
 
 	/**
 	 * Returns the plugin metadata.

@@ -3,6 +3,8 @@ package com.evilco.bot.PlugBot.core.plugin;
 import com.evilco.bot.PlugBot.Bot;
 import com.evilco.bot.PlugBot.core.plugin.annotation.Plugin;
 import com.evilco.bot.PlugBot.core.plugin.exception.PluginConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -26,6 +28,11 @@ public abstract class AbstractPlugin implements IPlugin {
 	 * Stores the suggest configuration file.
 	 */
 	private File configurationFile = null;
+
+	/**
+	 * Stores the log instance.
+	 */
+	private Logger log = null;
 
 	/**
 	 * Stores the plugin file.
@@ -55,6 +62,14 @@ public abstract class AbstractPlugin implements IPlugin {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public Logger GetLog () {
+		return this.log;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public Plugin GetMetadata () {
 		return this.metadata;
 	}
@@ -75,6 +90,9 @@ public abstract class AbstractPlugin implements IPlugin {
 		this.metadata = metadata;
 		this.file = pluginFile;
 		this.configurationFile = configurationFile;
+
+		// get logger
+		this.log = LogManager.getLogger (metadata.name ());
 	}
 
 	/**
