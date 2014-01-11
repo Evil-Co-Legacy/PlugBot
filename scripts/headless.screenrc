@@ -1,0 +1,2 @@
+screen -t Xvfb		0	Xvfb :10 -ac
+screen -t PlugBot	1	java -jar PlugBot.jar
