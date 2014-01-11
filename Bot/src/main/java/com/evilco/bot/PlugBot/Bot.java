@@ -13,10 +13,12 @@ import com.evilco.bot.PlugBot.core.plugin.PluginManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.dialect.MySQLDialect;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -93,6 +95,11 @@ public class Bot {
 	 * Stores the current plug.dj interface (used to unify plug.dj APIs in Java).
 	 */
 	protected PlugInterface plugInterface = null;
+
+	/**
+	 * Stores the session factory (used for database access).
+	 */
+	protected SessionFactory sessionFactory = null;
 
 	/**
 	 * The log interface.
@@ -248,9 +255,39 @@ public class Bot {
 	}
 
 	/**
+	 * Returns the hibernate session factory.
+	 * @return
+	 */
+	public SessionFactory GetSessionFactory () {
+		return this.sessionFactory;
+	}
+
+	/**
 	 * Starts the bot.
 	 */
 	public void Start () {
+		// setup persistance
+		if (this.configuration.database.enableDatabase) {
+			org.hibernate.cfg.Configuration persistanceConfiguration = new org.hibernate.cfg.Configuration();
+			persistanceConfiguration.setProperty ("connection.url", this.configuration.database.url);
+			persistanceConfiguration.setProperty ("connection.username", this.configuration.database.username);
+			persistanceConfiguration.setProperty ("connection.password", this.configuration.database.password);
+
+			// check dialects
+			if (this.configuration.database.url.contains ("mysql"))
+				persistanceConfiguration.setProperty ("hibernate.dialect", MySQLDialect.class.getName ());
+			else
+				this.log.error ("The database dialect could not be detected. Please note that there is currently only a limited amount of dialects available and an override feature has not been implemented yet!");
+
+			// create registry builder
+			BootstrapServiceRegistry bootstrapServiceRegistry = (new BootstrapServiceRegistryBuilder ()).build ();
+			StandardServiceRegistryBuilder standardServiceRegistryBuilder = new StandardServiceRegistryBuilder (bootstrapServiceRegistry).applySettings(persistanceConfiguration.getProperties ());
+
+			// construct session factory
+			this.sessionFactory = persistanceConfiguration.buildSessionFactory (standardServiceRegistryBuilder.build ());
+		} else
+			this.log.warn ("The database API has been disabled. Please note that some plugins might not function without it.");
+
 		// load plugins
 		this.pluginManager.LoadPlugins ();
 
@@ -415,13 +452,47 @@ public class Bot {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// create dump fileName
+		StringBuilder dumpFile = new StringBuilder ("crash-");
+
+		TimeZone timeZone = TimeZone.getTimeZone("UTC");
+		DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss-SSS");
+		dateFormat.setTimeZone (timeZone);
+		dumpFile.append (dateFormat.format (new Date ()));
+		dumpFile.append (".txt");
+
+		// start
 		try {
 			// create new bot instance
 			instance = new Bot (args);
 
 			// go into normal processing mode
 			instance.Start ();
+		} catch (WebDriverException ex) {
+			instance.log.error ("An exception occurred in the browser control system.");
+			instance.log.error ("This is most likely a temporary problem with this software or the service provider.");
+			instance.log.error ("Remember that some drivers require an external executable to be set up in a very specific way.");
+			instance.log.error ("Please check the crash log at {} for more information on this crash.", dumpFile.toString ());
+			instance.log.error ("------------------------------------------------------------------------------------------------");
+			instance.log.error (ex);
+			instance.log.error ("------------------------------------------------------------------------------------------------");
+		} catch (Exception ex) {
+			try {
+				instance.log.error ("An exception occurred during application initialization.");
+				instance.log.error ("This is most likely a configuration error or a problem in your version of this software.");
+				instance.log.error ("Please check the crash log at {} for more information on this crash.", dumpFile.toString ());
+				instance.log.error ("------------------------------------------------------------------------------------------------");
+				instance.log.error (ex);
+				instance.log.error ("------------------------------------------------------------------------------------------------");
+			} catch (Exception e) {
+				System.err.println ("The application has crashed. Please check the " + dumpFile.toString () + " for more information.");
+			} finally {
+				// stop application
+				return;
+			}
+		}
 
+		try {
 			// enter poll mode
 			instance.Listen ();
 		} catch (Exception ex) {
@@ -429,14 +500,6 @@ public class Bot {
 			try {
 				instance.log.error ("The bot has crashed. A restart has been queued to restore the correct application state.", ex);
 			} catch (Exception e) { }
-
-			// create dump fileName
-			StringBuilder dumpFile = new StringBuilder ("crash-");
-
-			TimeZone timeZone = TimeZone.getTimeZone("UTC");
-			DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			dateFormat.setTimeZone (timeZone);
-			dumpFile.append (dateFormat.format (new Date ()));
 
 			// write crash dump
 			FileWriter fileWriter = null;
@@ -482,7 +545,7 @@ public class Bot {
 			// queue garbage collection
 			System.gc ();
 
-			// try to restart application (until Java kills us)
+			// restart
 			main (args);
 		}
 	}
