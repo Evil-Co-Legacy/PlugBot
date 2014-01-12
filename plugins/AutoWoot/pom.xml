@@ -24,9 +24,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- Selenium Configuration -->
-		<selenium.version>2.39.0</selenium.version>
-
 		<!-- Signing Configuration -->
 		<signing.keyStore>${basedir}../evilco-keystore</signing.keyStore>
 		<signing.password>changeit</signing.password>
