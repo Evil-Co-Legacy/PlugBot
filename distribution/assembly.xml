@@ -9,6 +9,22 @@
 	
 	<includeBaseDirectory>false</includeBaseDirectory>
 	
+	<files>
+		<file>
+			<source>${project.basedir}/../LICENSE</source>
+			<destName>LICENSE</destName>
+			<outputDirectory>/</outputDirectory>
+			<filtered>false</filtered>
+		</file>
+		
+		<file>
+			<source>${project.basedir}/3RD-PARTY-LICENSE</source>
+			<destName>3RD-PARTY-LICENSE</destName>
+			<outputDirectory>/</outputDirectory>
+			<filtered>false</filtered>
+		</file>
+	</files>
+	
 	<moduleSets>
 		<moduleSet>
 			<useAllReactorProjects>true</useAllReactorProjects>

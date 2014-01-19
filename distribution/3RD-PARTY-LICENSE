@@ -1,0 +1,10 @@
+=== 3rd Party Licenses ===
+Please note that this distribution might include
+external dependencies (in the lib folder) which might
+not be licensed under the terms of the GNU Lesser General
+Public License or similar licenses. The corresponding
+licenses should be included inside the binary version
+of this dependency.
+
+Please feel free to append the exact license texts
+to this file on GitHub (https://github.com/LordAkkarin/PlugBot).
