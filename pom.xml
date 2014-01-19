@@ -16,5 +16,7 @@
 		<module>plugins/HistoryCheck</module>
 		<module>plugins/LengthLimiter</module>
 		<module>plugins/UserGreet</module>
+		
+		<module>distribution</module>
 	</modules>
 </project>
