@@ -34,6 +34,22 @@
 		<signing.alias>evilco-commercial</signing.alias>
 	</properties>
 
+	<!-- Build Repositories -->
+	<repositories>
+		<!-- Spring (Releases) -->
+		<repository>
+			<id>spring-libs-release</id>
+			<url>http://repo.spring.io/libs-release/</url>
+		</repository>
+
+		<!-- Spring (Milestones) -->
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>http://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+
 	<!-- Build Dependencies -->
 	<dependencies>
 		<!-- Selenium Core -->
@@ -61,6 +77,20 @@
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-chrome-driver</artifactId>
 			<version>${selenium.driver.chromeVersion}</version>
+		</dependency>
+
+		<!-- Spring Framework -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.0.0.RELEASE</version>
+		</dependency>
+
+		<!-- Spring Framework (Shell) -->
+		<dependency>
+			<groupId>org.springframework.shell</groupId>
+			<artifactId>spring-shell</artifactId>
+			<version>1.1.0.M1</version>
 		</dependency>
 
 		<!-- Hibernate -->
@@ -152,6 +182,17 @@
 
 				<includes>
 					<include>log4j2.xml</include>
+				</includes>
+			</resource>
+
+			<!-- /META-INF -->
+			<resource>
+				<directory>${basedir}/src/main/resources/META-INF</directory>
+				<targetPath>META-INF</targetPath>
+
+				<includes>
+					<include>*</include>
+					<include>**/*</include>
 				</includes>
 			</resource>
 		</resources>

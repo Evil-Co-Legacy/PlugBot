@@ -22,12 +22,9 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.shell.Bootstrap;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * @package com.evilco.bot.PlugBot
@@ -451,102 +448,79 @@ public class Bot {
 	 * Main Entry Point
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		// create dump fileName
-		StringBuilder dumpFile = new StringBuilder ("crash-");
+	public static void main(final String[] args) {
+		Thread botThread = new Thread () {
 
-		TimeZone timeZone = TimeZone.getTimeZone("UTC");
-		DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss-SSS");
-		dateFormat.setTimeZone (timeZone);
-		dumpFile.append (dateFormat.format (new Date ()));
-		dumpFile.append (".txt");
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run () {
+				// start
+				try {
+					// create new bot instance
+					Bot.instance = new Bot (args);
 
-		// start
-		try {
-			// create new bot instance
-			instance = new Bot (args);
+					// go into normal processing mode
+					Bot.instance.Start ();
+				} catch (WebDriverException ex) {
+					Bot.instance.log.error ("An exception occurred in the browser control system.");
+					Bot.instance.log.error ("This is most likely a temporary problem with this software or the service provider.");
+					Bot.instance.log.error ("Remember that some drivers require an external executable to be set up in a very specific way.");
+					Bot.instance.log.error ("------------------------------------------------------------------------------------------------");
+					Bot.instance.log.error (ex);
+					Bot.instance.log.error ("------------------------------------------------------------------------------------------------");
 
-			// go into normal processing mode
-			instance.Start ();
-		} catch (WebDriverException ex) {
-			instance.log.error ("An exception occurred in the browser control system.");
-			instance.log.error ("This is most likely a temporary problem with this software or the service provider.");
-			instance.log.error ("Remember that some drivers require an external executable to be set up in a very specific way.");
-			instance.log.error ("Please check the crash log at {} for more information on this crash.", dumpFile.toString ());
-			instance.log.error ("------------------------------------------------------------------------------------------------");
-			instance.log.error (ex);
-			instance.log.error ("------------------------------------------------------------------------------------------------");
-		} catch (Exception ex) {
-			try {
-				instance.log.error ("An exception occurred during application initialization.");
-				instance.log.error ("This is most likely a configuration error or a problem in your version of this software.");
-				instance.log.error ("Please check the crash log at {} for more information on this crash.", dumpFile.toString ());
-				instance.log.error ("------------------------------------------------------------------------------------------------");
-				instance.log.error (ex);
-				instance.log.error ("------------------------------------------------------------------------------------------------");
-			} catch (Exception e) {
-				System.err.println ("The application has crashed. Please check the " + dumpFile.toString () + " for more information.");
-			} finally {
-				// stop application
-				return;
+					throw new RuntimeException (ex);
+				} catch (Exception ex) {
+					try {
+						Bot.instance.log.error ("An exception occurred during application initialization.");
+						Bot.instance.log.error ("This is most likely a configuration error or a problem in your version of this software.");
+						Bot.instance.log.error ("------------------------------------------------------------------------------------------------");
+						Bot.instance.log.error (ex);
+						Bot.instance.log.error ("------------------------------------------------------------------------------------------------");
+					} catch (Exception e) {
+						System.err.println ("The application has crashed.");
+					} finally {
+						throw new RuntimeException (ex);
+					}
+				}
+
+				try {
+					// enter poll mode
+					Bot.instance.Listen ();
+				} catch (Exception ex) {
+					// write to log (if available)
+					try {
+						Bot.instance.log.error ("The bot has crashed.", ex);
+					} catch (Exception e) { }
+
+					// delete instance
+					try {
+						Bot.instance.Shutdown ();
+					} catch (Exception e) { }
+
+					// completely delete it
+					Bot.instance = null;
+
+					// queue garbage collection
+					System.gc ();
+				}
 			}
-		}
+		};
 
+		// start thread
+		botThread.start ();
+
+		// start shell
 		try {
-			// enter poll mode
-			instance.Listen ();
-		} catch (Exception ex) {
-			// write to log (if available)
+			Bootstrap.main (args);
+		} catch (IOException ex) {
+			throw new RuntimeException (ex);
+		} finally {
 			try {
-				instance.log.error ("The bot has crashed. A restart has been queued to restore the correct application state.", ex);
-			} catch (Exception e) { }
-
-			// write crash dump
-			FileWriter fileWriter = null;
-			PrintWriter printWriter = null;
-
-			try {
-				fileWriter = new FileWriter (dumpFile.toString (), true);
-				printWriter = new PrintWriter (fileWriter);
-
-				// write exception
-				ex.printStackTrace (printWriter);
-
-				// flush
-				printWriter.flush ();
-				fileWriter.flush ();
-			} catch (IOException e) {
-				try {
-					instance.log.error ("Could not write crash dump to file.", e);
-				} catch (Exception ignore) { }
-			} finally {
-				try {
-					printWriter.close ();
-				} catch (Exception e) { }
-
-				try {
-					fileWriter.close ();
-				} catch (Exception e) { }
-			}
-
-			// write log (if available)
-			try {
-				instance.log.error ("Restarting ...");
-			} catch (Exception e) { }
-
-			// delete instance
-			try {
-				instance.Shutdown ();
-			} catch (Exception e) { }
-
-			// completely delete it
-			instance = null;
-
-			// queue garbage collection
-			System.gc ();
-
-			// restart
-			main (args);
+				Bot.instance.Shutdown ();
+			} catch (Exception ex) { }
 		}
 	}
 }
