@@ -4,6 +4,7 @@ import com.evilco.plug.bot.core.configuration.BotConfiguration;
 import com.evilco.plug.bot.core.configuration.CoreBeanConfiguration;
 import com.evilco.plug.bot.core.driver.ChromeDriverDownloader;
 import com.evilco.plug.bot.core.driver.WebDriverType;
+import com.evilco.plug.bot.core.plugin.PluginManager;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -11,8 +12,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +33,7 @@ import java.util.logging.Logger;
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
 @Component
-public class Bot implements Runnable {
+public class Bot implements Runnable, ApplicationContextAware {
 
 	/**
 	 * Defines the plug.dj base URL (homepage).
@@ -43,6 +49,11 @@ public class Bot implements Runnable {
 	 * Stores the internal logger.
 	 */
 	public static final Logger logger = Logger.getLogger ("PlugBot");
+
+	/**
+	 * Stores the current application context.
+	 */
+	protected ApplicationContext applicationContext = null;
 
 	/**
 	 * Stores the bot configuration.
@@ -76,6 +87,14 @@ public class Bot implements Runnable {
 	}
 
 	/**
+	 * Returns the current driver instance.
+	 * @return
+	 */
+	public WebDriver getDriver () {
+		return this.driver;
+	}
+
+	/**
 	 * Returns the default library directory.
 	 * @return
 	 */
@@ -88,6 +107,13 @@ public class Bot implements Runnable {
 
 		// return
 		return directory;
+	}
+
+	/**
+	 * Initializes the plugin manager.
+	 */
+	protected void initializePluginManager () {
+		((PluginManager) this.applicationContext.getBean ("pluginManager")).loadAll ();
 	}
 
 	/**
@@ -149,6 +175,15 @@ public class Bot implements Runnable {
 
 		// create web driver
 		this.initializeWebDriver ();
+		this.initializePluginManager ();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setApplicationContext (ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
 	}
 
 	/**
@@ -156,5 +191,14 @@ public class Bot implements Runnable {
 	 */
 	public void shutdown () {
 		// TODO
+
+		// get registry
+		DefaultListableBeanFactory registry = ((DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory());
+
+		// delete singleton instances
+		registry.destroySingleton ("pluginManager");
+		registry.destroySingleton ("eventManager");
+		registry.destroySingleton ("driver");
+		registry.destroySingleton ("Bot");
 	}
 }
