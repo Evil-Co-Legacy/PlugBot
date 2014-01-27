@@ -1,5 +1,7 @@
 package com.evilco.plug.bot.core.authentication;
 
+import com.evilco.plug.bot.core.Bot;
+import com.evilco.plug.bot.core.configuration.BotConfiguration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -38,7 +40,19 @@ public class GoogleAuthenticationProvider implements IAuthenticationProvider {
 		while (!this.driver.getCurrentUrl ().contains ("google.com"));
 
 		// log
-		logger.info ("Entering Google login information.");
+		logger.info ("Entering login information.");
+
+		// enter username
+		WebElement usernameElement = this.driver.findElement (By.id ("Email"));
+		usernameElement.sendKeys (username);
+
+		// enter password
+		WebElement passwordElement = this.driver.findElement (By.id ("Passwd"));
+		passwordElement.sendKeys (password);
+
+		// submit
+		WebElement submitButton = this.driver.findElement (By.id ("signIn"));
+		submitButton.click ();
 	}
 
 	/**
