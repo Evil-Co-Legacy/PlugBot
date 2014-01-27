@@ -13,6 +13,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
  */
 @Component
 @XmlRootElement (name = "configuration", namespace = BotConfiguration.NAMESPACE)
+@XmlType (propOrder = {"account", "driver"})
 public class BotConfiguration {
 
 	/**
@@ -49,6 +51,7 @@ public class BotConfiguration {
 	/**
 	 * Defines the driver configuration.
 	 */
+	@XmlElement (name = "driver", namespace = NAMESPACE)
 	public DriverConfiguration driver = new DriverConfiguration ();
 
 	/**
@@ -136,37 +139,44 @@ public class BotConfiguration {
 	/**
 	 * Stores account related information.
 	 */
+	@XmlType (propOrder = {"type", "username", "password"})
 	public static class AccountConfiguration {
 
 		/**
 		 * Defines the password.
 		 */
+		@XmlElement (name = "password", namespace = NAMESPACE)
 		public String password = "12345678";
 
 		/**
 		 * Defines the account type.
 		 */
+		@XmlElement (name = "type", namespace = NAMESPACE)
 		public String type = "Google";
 
 		/**
 		 * Defines the username.
 		 */
+		@XmlElement (name = "username", namespace = NAMESPACE)
 		public String username = "user@example.org";
 	}
 
 	/**
 	 * Stores driver related information.
 	 */
+	@XmlType (propOrder = {"name", "url"})
 	public static class DriverConfiguration {
 
 		/**
 		 * Defines the driver name.
 		 */
+		@XmlElement (name = "name", namespace = NAMESPACE)
 		public String name = "Chrome";
 
 		/**
 		 * Defines the driver URL (applies to the remote driver).
 		 */
+		@XmlElement (name = "url", namespace = NAMESPACE)
 		public String url = "http://127.0.0.1:14444/wd/hub";
 	}
 }
