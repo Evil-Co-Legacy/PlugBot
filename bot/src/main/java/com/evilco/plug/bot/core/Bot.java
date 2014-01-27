@@ -1,9 +1,13 @@
 package com.evilco.plug.bot.core;
 
+import com.evilco.plug.bot.core.authentication.IAuthenticationProvider;
 import com.evilco.plug.bot.core.configuration.BotConfiguration;
 import com.evilco.plug.bot.core.configuration.CoreBeanConfiguration;
 import com.evilco.plug.bot.core.driver.ChromeDriverDownloader;
 import com.evilco.plug.bot.core.driver.WebDriverType;
+import com.evilco.plug.bot.core.event.EventManager;
+import com.evilco.plug.bot.core.event.system.AuthenticationInitializeEvent;
+import com.evilco.plug.bot.core.event.system.AuthenticationSuccessEvent;
 import com.evilco.plug.bot.core.plugin.PluginManager;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
@@ -33,7 +37,13 @@ import java.util.logging.Logger;
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
 @Component
+@Configuration
 public class Bot implements Runnable, ApplicationContextAware {
+
+	/**
+	 * Defines the authentication timeout (60 seconds).
+	 */
+	public static final long AUTHENTICATION_TIMEOUT = 60000;
 
 	/**
 	 * Defines the plug.dj base URL (homepage).
@@ -64,12 +74,59 @@ public class Bot implements Runnable, ApplicationContextAware {
 	/**
 	 * Stores the driver to use for communication.
 	 */
-	protected WebDriver driver = null;
+	@Autowired
+	protected WebDriver driver;
+
+	/**
+	 * Stores the event manager instance.
+	 */
+	@Autowired
+	protected EventManager eventManager;
 
 	/**
 	 * Constructs a new bot.
 	 */
 	public Bot () { }
+
+	/**
+	 * Authenticates the bot.
+	 */
+	protected void authenticate () {
+		// log
+		logger.info ("Starting authentication ...");
+
+		// fire event
+		AuthenticationInitializeEvent event = new AuthenticationInitializeEvent (this);
+		this.eventManager.fireEvent (event);
+
+		// get current time
+		long authenticationStart = System.currentTimeMillis ();
+
+		// get correct authentication provider
+		IAuthenticationProvider provider = ((IAuthenticationProvider) this.applicationContext.getBean ("authenticationProvider"));
+
+		// announce provider
+		logger.info ("Using authentication provider \"" + provider.getProviderName () + "\".");
+
+		// log in
+		provider.authenticate (this.configuration.account.username, this.configuration.account.password);
+
+		// log
+		logger.info ("Finished authentication. Waiting for plug.dj ...");
+
+		// wait for plug.dj
+		while (!this.driver.getCurrentUrl ().contains ("/communities") && ((System.currentTimeMillis () - authenticationStart) < AUTHENTICATION_TIMEOUT));
+
+		// handle errors
+		if (!this.driver.getCurrentUrl ().contains ("/communities")) throw new RuntimeException ("Authentication with plug.dj timed out.");
+
+		// log
+		logger.info ("Successfully authenticated with plug.dj!");
+
+		// fire event
+		AuthenticationSuccessEvent successEvent = new AuthenticationSuccessEvent (this);
+		this.eventManager.fireEvent (event);
+	}
 
 	/**
 	 * Returns the application directory.
@@ -120,46 +177,7 @@ public class Bot implements Runnable, ApplicationContextAware {
 	 * Initializes the web driver instance.
 	 */
 	protected void initializeWebDriver () {
-		// find webdriver type
-		WebDriverType driverType = WebDriverType.valueOf (this.configuration.driver.name.toUpperCase ());
-
-		// verify
-		if (driverType == null) throw new RuntimeException ("Cannot find the driver implementation for " + this.configuration.driver.name + ". Aborting launch.");
-
-		// specify common capabilities
-		DesiredCapabilities capabilities = new DesiredCapabilities ();
-		capabilities.setJavascriptEnabled (true);
-
-		// create instance
-		switch (driverType) {
-			case CHROME:
-				// download chrome driver
-				ChromeDriverDownloader chromeDriverDownloader = new ChromeDriverDownloader ();
-				if (!chromeDriverDownloader.exists ()) chromeDriverDownloader.run ();
-
-				// set chrome path
-				System.setProperty ("webdriver.chrome.driver", chromeDriverDownloader.getDriverFile ().getAbsolutePath ());
-
-				// create driver instace
-				this.driver = new ChromeDriver (capabilities);
-				break;
-			case FIREFOX:
-				this.driver = new FirefoxDriver (capabilities);
-				break;
-			case REMOTE:
-				try {
-					this.driver = new RemoteWebDriver (new URL (this.configuration.driver.url), capabilities);
-				} catch (MalformedURLException ex) {
-					throw new RuntimeException ("The supplied remote driver URL is malformed.", ex);
-				}
-				break;
-		}
-
-		// update window size
-		this.driver.manage ().window ().setSize (WINDOW_DIMENSIONS);
-
-		// browse to plug.dj
-		this.driver.get (PLUG_BASE_URL);
+		this.applicationContext.getBean ("driver");
 	}
 
 	/**
@@ -173,9 +191,15 @@ public class Bot implements Runnable, ApplicationContextAware {
 		// log startup note
 		logger.info ("Starting a new PlugBot instance ...");
 
-		// create web driver
+		// initialize bot
 		this.initializeWebDriver ();
 		this.initializePluginManager ();
+
+		// authenticate
+		this.authenticate ();
+
+		// start interface
+
 	}
 
 	/**
@@ -190,12 +214,16 @@ public class Bot implements Runnable, ApplicationContextAware {
 	 * Tries to shut down all bot components.
 	 */
 	public void shutdown () {
-		// TODO
+		// shutdown driver
+		try {
+			this.driver.close ();
+		} catch (Exception ex) { }
 
 		// get registry
 		DefaultListableBeanFactory registry = ((DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory());
 
 		// delete singleton instances
+		registry.destroySingleton ("authenticationProvider");
 		registry.destroySingleton ("pluginManager");
 		registry.destroySingleton ("eventManager");
 		registry.destroySingleton ("driver");
