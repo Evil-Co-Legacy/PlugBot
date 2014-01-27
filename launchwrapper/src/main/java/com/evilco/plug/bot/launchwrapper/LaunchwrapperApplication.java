@@ -1,6 +1,7 @@
 package com.evilco.plug.bot.launchwrapper;
 
 import com.evilco.plug.bot.core.Bot;
+import com.evilco.plug.bot.core.configuration.CoreBeanConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -73,7 +74,7 @@ public class LaunchwrapperApplication {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext ();
 
 		// add core configuration
-		context.register (Bot.class);
+		context.register (CoreBeanConfiguration.class);
 		context.refresh ();
 
 		// create new bot instance

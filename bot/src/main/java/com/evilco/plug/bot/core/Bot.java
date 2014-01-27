@@ -26,9 +26,6 @@ import java.util.logging.Logger;
  * @auhtor Johannes Donath <johannesd@evil-co.com>
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
-@ComponentScan
-@Import (CoreBeanConfiguration.class)
-@Configuration
 @Component
 public class Bot implements Runnable {
 
@@ -137,17 +134,6 @@ public class Bot implements Runnable {
 
 		// browse to plug.dj
 		this.driver.get (PLUG_BASE_URL);
-	}
-
-	/**
-	 * Constructs a new bot instance.
-	 * @todo Find a better solution for this problem ...
-	 * @return
-	 */
-	@Bean (name = "Bot")
-	@Scope ("prototype")
-	public static Bot newInstance () {
-		return (new Bot ());
 	}
 
 	/**
