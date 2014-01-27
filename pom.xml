@@ -14,7 +14,7 @@
 
 	<!-- Sub Modules -->
 	<modules>
-		<module>../bot</module>
-		<module>../launchwrapper</module>
+		<module>bot</module>
+		<module>launchwrapper</module>
 	</modules>
 </project>
