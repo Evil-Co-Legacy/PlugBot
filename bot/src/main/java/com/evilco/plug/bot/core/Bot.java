@@ -5,6 +5,7 @@ import com.evilco.plug.bot.core.configuration.CoreBeanConfiguration;
 import com.evilco.plug.bot.core.driver.ChromeDriverDownloader;
 import com.evilco.plug.bot.core.driver.WebDriverType;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -30,6 +31,16 @@ import java.util.logging.Logger;
 @Configuration
 @Component
 public class Bot implements Runnable {
+
+	/**
+	 * Defines the plug.dj base URL (homepage).
+	 */
+	public static final String PLUG_BASE_URL = "http://plug.dj";
+
+	/**
+	 * Defines the browser window size.
+	 */
+	public static final Dimension WINDOW_DIMENSIONS = new Dimension (1280, 720);
 
 	/**
 	 * Stores the internal logger.
@@ -120,6 +131,12 @@ public class Bot implements Runnable {
 				}
 				break;
 		}
+
+		// update window size
+		this.driver.manage ().window ().setSize (WINDOW_DIMENSIONS);
+
+		// browse to plug.dj
+		this.driver.get (PLUG_BASE_URL);
 	}
 
 	/**
