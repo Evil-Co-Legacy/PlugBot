@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Parent Artifact -->
+	<parent>
+		<artifactId>parent</artifactId>
+		<groupId>com.evilco.plug.bot</groupId>
+		<version>2.0-SNAPSHOT</version>
+		<relativePath>../parent/pom.xml</relativePath>
+	</parent>
+
+	<!-- Artifact Information -->
+	<artifactId>core</artifactId>
+	<packaging>jar</packaging>
+
+	<!-- Artifact Metadata -->
+	<name>PlugBot</name>
+	<description>A basic bot framework for plug.dj.</description>
+	<inceptionYear>2013</inceptionYear>
+
+	<!-- Organization Metadata -->
+	<organization>
+		<name>Evil-Co</name>
+		<url>http://www.evil-co.org</url>
+	</organization>
+
+	<!-- Contributor Metadata -->
+	<contributors>
+		<contributor>
+			<name>Johannes "Akkarin" Donath</name>
+			<email>johannesd@evil-co.com</email>
+			<timezone>Europe/Berlin</timezone>
+
+			<!-- Roles -->
+			<roles>
+				<role>Project Maintainer</role>
+				<role>Developer</role>
+			</roles>
+
+			<!-- Organization -->
+			<organization>Evil-Co</organization>
+			<organizationUrl>http://www.evil-co.org</organizationUrl>
+		</contributor>
+	</contributors>
+
+	<!-- License Metadata -->
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
+
+	<!-- CI Management -->
+	<ciManagement>
+		<system>Atlassian Bamboo</system>
+		<url>http://www.evil-co.com/ci</url>
+	</ciManagement>
+
+	<!-- Issue Management -->
+	<issueManagement>
+		<system>Atlassian JIRA</system>
+		<url>http://evilco.atlassian.net</url>
+	</issueManagement>
+
+	<!-- VCS -->
+	<scm>
+		<connection>scm:git:git://github.com/LordAkkarin/PlugBot.git</connection>
+		<developerConnection>scm:git:git://git@github.com/LordAkkarin/PlugBot.git</developerConnection>
+		<url>https://github.com/LordAkkarin/PlugBot</url>
+		<tag>2.0</tag>
+	</scm>
+
+	<!-- Build Repositories -->
+	<repositories>
+		<!-- Spring Framework -->
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>http://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+
+	<!-- Dependencies -->
+	<dependencies>
+		<!-- Spring Framework -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.0.0.RELEASE</version>
+		</dependency>
+
+		<!-- CGLib -->
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+
+		<!-- Selenium Core -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>2.39.0</version>
+
+			<!-- Excludes -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-firefox-driver</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-htmlunit-driver</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-ie-driver</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-iphone-driver</artifactId>
+				</exclusion>
+
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-safari-driver</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>2.39.0</version>
+		</dependency>
+
+		<!-- Selenium Drivers -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+			<version>2.37.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>2.37.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-remote-driver</artifactId>
+			<version>2.37.1</version>
+		</dependency>
+	</dependencies>
+
+	<!-- Environment Variables -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<!-- Build Setup -->
+	<build>
+		<finalName>PlugBot-${project.version}</finalName>
+
+		<!-- Build Properties -->
+		<defaultGoal>clean install</defaultGoal>
+		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+		<testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+
+		<!-- Application Resources -->
+		<resources>
+			<!-- . -->
+			<resource>
+				<directory>${basedir}/..</directory>
+				<targetPath>.</targetPath>
+
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+
+			<!-- . -->
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<targetPath>.</targetPath>
+
+				<includes>
+					<include>spring.xml</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<!-- Build Plugins -->
+		<plugins>
+			<!-- Java Compiler -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+
+				<!-- Plugin Configuration -->
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
+			<!-- Jar Creation -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+
+				<!-- Plugin Configuration -->
+				<configuration>
+					<archive>
+						<addMavenDescriptor>true</addMavenDescriptor>
+
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Build Profiles -->
+	<profiles>
+		<!-- Release Profile -->
+		<profile>
+			<id>release</id>
+
+			<!-- TODO -->
+		</profile>
+	</profiles>
+</project>
