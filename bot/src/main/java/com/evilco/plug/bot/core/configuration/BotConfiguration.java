@@ -122,6 +122,10 @@ public class BotConfiguration {
 			// create marshaller
 			Marshaller marshaller = context.createMarshaller ();
 
+			// set properties
+			marshaller.setProperty (Marshaller.JAXB_ENCODING, "UTF-8");
+			marshaller.setProperty (Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
 			// marshal
 			marshaller.marshal (this, getConfigurationFile ());
 		} catch (JAXBException ex) {
