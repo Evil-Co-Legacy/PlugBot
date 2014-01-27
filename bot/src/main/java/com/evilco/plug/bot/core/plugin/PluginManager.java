@@ -57,7 +57,13 @@ public class PluginManager {
 	 * Constructs a new empty class loader.
 	 */
 	public PluginManager () {
+		logger.info ("Initializing the plugin manager instance ...");
+
+		// create map
 		this.pluginMap = new HashMap<String, PluginClassLoader> ();
+
+		// load all plugins
+		this.loadAll ();
 	}
 
 	/**
@@ -120,33 +126,52 @@ public class PluginManager {
 		// fire event
 		PluginLoadEvent event = new PluginLoadEvent (loader.getPlugin ());
 		this.eventManager.fireEvent (event);
+
+		// log
+		logger.info ("Loaded plugin \"" + loader.getMetadata ().name () + "\" (version " + loader.getMetadata ().version () + ") created by " + (loader.getMetadata ().author ().isEmpty () ? "Unknown" : loader.getMetadata ().author ()) + " from file " + pluginFile.getName () + ".");
 	}
 
 	/**
 	 * Loads all plugins.
 	 */
 	public void loadAll () {
+		logger.info ("Loading all available plugins ...");
+
+		// get iterator
 		Iterator<File> it = FileUtils.iterateFiles (this.getPluginDirectory (), (new String[] {"jar"}), false);
 
 		// iterate over files
+		int pluginCount = 0;
+
 		while (it.hasNext ()) {
 			File file = it.next ();
 
 			// load plugin
 			try {
 				this.load (file);
+				pluginCount++;
 			} catch (PluginLoaderException ex) {
 				logger.log (Level.SEVERE, "Cannot load plugin: " + file.getName (), ex);
 			}
 		}
+
+		// log
+		logger.info ("Loaded " + pluginCount + " plugins.");
 	}
 
 	/**
 	 * Reloads all plugins.
 	 */
 	public void reload () {
+		logger.info ("Reloading ...");
+		long time = System.currentTimeMillis ();
+
+		// reload
 		this.unloadAll ();
 		this.loadAll ();
+
+		// log
+		logger.info ("Reload finished in " + (System.currentTimeMillis () - time) + " ms.");
 	}
 
 	/**
@@ -171,6 +196,9 @@ public class PluginManager {
 		// delete internal plugin instace
 		plugin = null;
 
+		// log
+		logger.info ("Unloading plugin \"" + this.pluginMap.get (name).getMetadata ().name () + "\" ...");
+
 		// delete class loader instance
 		this.pluginMap.remove (name);
 
@@ -182,6 +210,9 @@ public class PluginManager {
 	 * Unloads all plugins.
 	 */
 	public void unloadAll () {
+		logger.info ("Unloading all plugins ...");
+
+		// unload
 		for (Map.Entry<String, PluginClassLoader> plugin : this.pluginMap.entrySet ()) {
 			this.unload (plugin.getKey ());
 			plugin.setValue (null);
@@ -189,5 +220,8 @@ public class PluginManager {
 
 		// suggest garbage collection
 		System.gc ();
+
+		// info
+		logger.info ("All plugins have been unloaded.");
 	}
 }
