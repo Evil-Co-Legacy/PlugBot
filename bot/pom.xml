@@ -99,6 +99,13 @@
 			<version>2.2.2</version>
 		</dependency>
 
+		<!-- Commons IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
 		<!-- Selenium Core -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
