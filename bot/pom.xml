@@ -185,16 +185,6 @@
 					<include>LICENSE</include>
 				</includes>
 			</resource>
-
-			<!-- . -->
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<targetPath>.</targetPath>
-
-				<includes>
-					<include>spring.xml</include>
-				</includes>
-			</resource>
 		</resources>
 
 		<!-- Build Plugins -->
