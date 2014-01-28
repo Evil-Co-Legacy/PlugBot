@@ -71,17 +71,17 @@ public class PageCommunicationAdapter {
 		// parse event queue
 		for (String eventString : eventQueue) {
 			// find event detail
-			int seperatorPosition = eventString.indexOf (":");
+			int separatorPosition = eventString.indexOf (":");
 
 			// verify position
-			if (seperatorPosition < 0) {
+			if (separatorPosition < 0) {
 				logger.warning ("Ignoring event string due to malformed event string: " + eventString);
 				continue;
 			}
 
 			// get type
-			String typeString = eventString.substring (0, seperatorPosition);
-			String eventData = eventString.substring ((seperatorPosition + 1));
+			String typeString = eventString.substring (0, separatorPosition);
+			String eventData = eventString.substring ((separatorPosition + 1));
 
 			// find the event type
 			EventType type = EventType.valueOf (typeString);
