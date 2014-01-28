@@ -106,6 +106,13 @@
 			<version>0.9.9-RC1</version>
 		</dependency>
 
+		<!-- GSON (JSON Parser) -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+
 		<!-- Selenium Core -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
