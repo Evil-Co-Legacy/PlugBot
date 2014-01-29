@@ -3,6 +3,7 @@ package com.evilco.plug.bot.core.configuration;
 import com.evilco.plug.bot.core.Bot;
 import com.evilco.plug.bot.core.authentication.GoogleAuthenticationProvider;
 import com.evilco.plug.bot.core.authentication.IAuthenticationProvider;
+import com.evilco.plug.bot.core.communication.PageCommunicationAdapter;
 import com.evilco.plug.bot.core.driver.ChromeDriverDownloader;
 import com.evilco.plug.bot.core.driver.WebDriverType;
 import com.evilco.plug.bot.core.event.EventManager;
@@ -154,6 +155,16 @@ public class CoreBeanConfiguration {
 	@Scope ("singleton")
 	public EventManager eventManager () {
 		return (new EventManager ());
+	}
+
+	/**
+	 * Constructs a new page communication adapter.
+	 * @return
+	 */
+	@Bean
+	@Scope ("singleton")
+	public PageCommunicationAdapter pageCommunicationAdapter () {
+		return (new PageCommunicationAdapter ());
 	}
 
 	/**
