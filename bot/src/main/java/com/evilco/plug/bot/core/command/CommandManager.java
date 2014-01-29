@@ -97,7 +97,7 @@ public class CommandManager {
 			Command metadata = method.getAnnotation (Command.class);
 
 			// construct a new dynamic command
-			ICommand command = new DynamicCommand (handler, method, metadata.value (), metadata.argumentsMin (), metadata.argumentsMax (), metadata.description (), metadata.usage ());
+			ICommand command = new DynamicCommand (handler, method, metadata.value (), metadata.argumentsMin (), metadata.argumentsMax (), metadata.description (), metadata.permission (), metadata.usage ());
 
 			// register command
 			this.registerCommand (command, plugin);

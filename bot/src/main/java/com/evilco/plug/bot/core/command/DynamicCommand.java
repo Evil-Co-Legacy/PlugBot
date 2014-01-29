@@ -1,5 +1,7 @@
 package com.evilco.plug.bot.core.command;
 
+import com.evilco.plug.bot.core.communication.data.PermissionLevel;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -40,6 +42,11 @@ class DynamicCommand implements ICommand {
 	protected final Method method;
 
 	/**
+	 * Stores the required permission level.
+	 */
+	protected PermissionLevel permission;
+
+	/**
 	 * Stores the command usage.
 	 */
 	protected String usage;
@@ -54,13 +61,14 @@ class DynamicCommand implements ICommand {
 	 * @param description
 	 * @param usage
 	 */
-	public DynamicCommand (Object handler, Method method, String[] alias, int argumentsMinimal, int argumentsMaximal, String description, String usage) {
+	public DynamicCommand (Object handler, Method method, String[] alias, int argumentsMinimal, int argumentsMaximal, String description, PermissionLevel permission, String usage) {
 		this.handler = handler;
 		this.method = method;
 		this.alias = alias;
 		this.argumentsMinimal = argumentsMinimal;
 		this.argumentsMaximal = argumentsMaximal;
 		this.description = description;
+		this.permission = permission;
 		this.usage = usage;
 	}
 
@@ -69,6 +77,9 @@ class DynamicCommand implements ICommand {
 	 */
 	@Override
 	public void execute (ICommandSender sender, String alias, String[] arguments) throws CommandException {
+		// verify permissions
+		if (this.permission != PermissionLevel.NONE && !sender.hasPermission (this.permission)) throw new CommandPermissionException ("A permission level of " + this.permission.toString () + " or above is required.");
+
 		// verify arguments
 		if (arguments.length < this.argumentsMinimal) throw new InvalidCommandArgumentException ("Not enough arguments supplied.");
 		if (this.argumentsMaximal <= 0 && arguments.length > this.argumentsMaximal) throw new InvalidCommandArgumentException ("More arguments supplied than allowed.");
