@@ -3,6 +3,7 @@ package com.evilco.plug.bot.core.configuration;
 import com.evilco.plug.bot.core.Bot;
 import com.evilco.plug.bot.core.authentication.GoogleAuthenticationProvider;
 import com.evilco.plug.bot.core.authentication.IAuthenticationProvider;
+import com.evilco.plug.bot.core.command.CommandManager;
 import com.evilco.plug.bot.core.communication.PageCommunicationAdapter;
 import com.evilco.plug.bot.core.driver.ChromeDriverDownloader;
 import com.evilco.plug.bot.core.driver.WebDriverType;
@@ -68,6 +69,16 @@ public class CoreBeanConfiguration {
 	@Scope ("singleton")
 	public Bot bot () {
 		return new Bot ();
+	}
+
+	/**
+	 * Constructs a new command manager.
+	 * @return
+	 */
+	@Bean
+	@Scope ("singleton")
+	public CommandManager commandManager () {
+		return (new CommandManager ());
 	}
 
 	/**

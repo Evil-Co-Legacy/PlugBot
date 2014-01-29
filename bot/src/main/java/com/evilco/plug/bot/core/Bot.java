@@ -276,6 +276,7 @@ public class Bot implements Runnable, ApplicationContextAware {
 		// delete singleton instances
 		registry.destroySingleton ("userList");
 		registry.destroySingleton ("pageCommunicationAdapter");
+		registry.destroySingleton ("commandManager");
 		registry.destroySingleton ("authenticationProvider");
 		registry.destroySingleton ("pluginManager");
 		registry.destroySingleton ("eventManager");
