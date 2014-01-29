@@ -659,6 +659,9 @@ public class PageCommunicationAdapter {
 											this.blacklistInteractionMap.put (message.fromID, 1);
 										else
 											this.blacklistInteractionMap.put (message.fromID, (this.blacklistInteractionMap.get (message.fromID) + 1));
+
+										// notify user
+										if (this.blacklistInteractionMap.get (message.fromID) > BLACKLIST_INTERACTION_AMOUNT) sender.sendMessage ("You have been blacklisted due to spamming the bot with nonsense.");
 									}
 
 									// stop execution
