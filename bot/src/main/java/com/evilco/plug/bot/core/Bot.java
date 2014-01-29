@@ -1,6 +1,7 @@
 package com.evilco.plug.bot.core;
 
 import com.evilco.plug.bot.core.authentication.IAuthenticationProvider;
+import com.evilco.plug.bot.core.communication.PageCommunicationAdapter;
 import com.evilco.plug.bot.core.configuration.BotConfiguration;
 import com.evilco.plug.bot.core.configuration.CoreBeanConfiguration;
 import com.evilco.plug.bot.core.driver.ChromeDriverDownloader;
@@ -51,6 +52,11 @@ public class Bot implements Runnable, ApplicationContextAware {
 	public static final String PLUG_BASE_URL = "http://plug.dj";
 
 	/**
+	 * Defines the maximum amount of time joining a room can take.
+	 */
+	public static final int ROOM_TIMEOUT = 30000;
+
+	/**
 	 * Defines the browser window size.
 	 */
 	public static final Dimension WINDOW_DIMENSIONS = new Dimension (1280, 720);
@@ -82,6 +88,17 @@ public class Bot implements Runnable, ApplicationContextAware {
 	 */
 	@Autowired
 	protected EventManager eventManager;
+
+	/**
+	 * Indicates whether the bot is still alive.
+	 */
+	protected boolean isAlive = false;
+
+	/**
+	 * Stores the page communication adapter instance.
+	 */
+	@Autowired
+	protected PageCommunicationAdapter pageCommunicationAdapter;
 
 	/**
 	 * Constructs a new bot.
@@ -181,10 +198,44 @@ public class Bot implements Runnable, ApplicationContextAware {
 	}
 
 	/**
+	 * Joins the room and starts to poll events.
+	 */
+	protected void joinRoom () {
+		logger.info ("Joining room ...");
+
+		// request room
+		this.driver.get (PLUG_BASE_URL + "/" + this.configuration.room);
+
+		// initialize variables
+		long start = System.currentTimeMillis ();
+
+		// log
+		logger.info ("Synchronizing with plug.dj ...");
+
+		// wait for API to become ready
+		while (!this.pageCommunicationAdapter.isApiReady () && (System.currentTimeMillis () - start) <= ROOM_TIMEOUT);
+
+		// check
+		if (!this.pageCommunicationAdapter.isApiReady ()) throw new RuntimeException ("plug.dj did not expose it's API during the " + ROOM_TIMEOUT + " seconds handshake period.");
+
+		// log
+		logger.info ("Synchronization took " + (System.currentTimeMillis () - start) + " ms.");
+		logger.info ("Injecting communication API ...");
+
+		// inject API calls
+		this.pageCommunicationAdapter.inject ();
+
+		// log
+		logger.info ("API is ready. Event polling has been set up.");
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void run () {
+		this.isAlive = true;
+
 		// wait for launcher
 		try { Thread.sleep (2200); } catch (Exception ex) { }
 
@@ -199,7 +250,10 @@ public class Bot implements Runnable, ApplicationContextAware {
 		this.authenticate ();
 
 		// start interface
+		this.joinRoom ();
 
+		// block thread
+		while (this.isAlive) { }
 	}
 
 	/**
@@ -214,19 +268,18 @@ public class Bot implements Runnable, ApplicationContextAware {
 	 * Tries to shut down all bot components.
 	 */
 	public void shutdown () {
-		// shutdown driver
-		try {
-			this.driver.close ();
-		} catch (Exception ex) { }
+		this.isAlive = false;
 
 		// get registry
 		DefaultListableBeanFactory registry = ((DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory());
 
 		// delete singleton instances
+		registry.destroySingleton ("userList");
+		registry.destroySingleton ("pageCommunicationAdapter");
 		registry.destroySingleton ("authenticationProvider");
 		registry.destroySingleton ("pluginManager");
 		registry.destroySingleton ("eventManager");
-		registry.destroySingleton ("driver");
+		registry.destroySingleton ("driver"); // This will automatically call close ()
 		registry.destroySingleton ("Bot");
 	}
 }
