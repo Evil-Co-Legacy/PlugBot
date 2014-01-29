@@ -134,6 +134,14 @@ class DynamicCommand implements ICommand {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public PermissionLevel getPermission () {
+		return this.permission;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getUsage () {
 		return this.usage;
 	}

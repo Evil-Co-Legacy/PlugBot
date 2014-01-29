@@ -1,5 +1,7 @@
 package com.evilco.plug.bot.core.command;
 
+import com.evilco.plug.bot.core.communication.data.PermissionLevel;
+
 /**
  * @auhtor Johannes Donath <johannesd@evil-co.com>
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
@@ -31,6 +33,12 @@ public interface ICommand {
 	 * @return
 	 */
 	public String getDescription ();
+
+	/**
+	 * Returns the minimal required permission level for this command.
+	 * @return
+	 */
+	public PermissionLevel getPermission ();
 
 	/**
 	 * Returns the correct command usage.
