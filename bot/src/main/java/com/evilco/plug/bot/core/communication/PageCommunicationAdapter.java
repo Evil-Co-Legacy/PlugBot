@@ -106,6 +106,9 @@ public class PageCommunicationAdapter {
 			this.executor.executeScript ("API.on (API." + type.toString () + ", function (data) { window.PlugBotHandler ('" + type.toString () + ":' + JSON.stringify (data)); });");
 		}
 
+		// disable sound output
+		this.executor.executeScript ("API.setVolume (0);");
+
 		// enable
 		this.enabled = true;
 	}
@@ -170,7 +173,8 @@ public class PageCommunicationAdapter {
 					case USER_JOIN:
 					case USER_LEAVE:
 					case USER_SKIP:
-					case VOTE_SKIP: break;
+					case VOTE_SKIP:
+					case WAIT_LIST_UPDATE: break;
 
 					default:
 						gson.fromJson (eventData, JSONObject.class);
@@ -323,6 +327,9 @@ public class PageCommunicationAdapter {
 				logger.warning ("Skipping event of type " + type.toString () + ": No event instance has been constructed.");
 				continue;
 			}
+
+			// debug code
+			logger.info ("Dispatching event of type " + type.toString () + ".");
 
 			// dispatch
 			this.eventManager.fireEvent (event);
