@@ -25,4 +25,31 @@ public class Media {
 	 * Stores the media format (1 = YouTube, 2 = SoundCloud
 	 */
 	public int format;
+
+	/**
+	 * A unique identifier for each media file.
+	 */
+	public String id;
+
+	/**
+	 * Stores the preview image (if any).
+	 */
+	public String image;
+
+	/**
+	 * ???
+	 * @todo To be documented ...
+	 */
+	public int index;
+
+	/**
+	 * ???
+	 * @todo To be documented ...
+	 */
+	public int modified;
+
+	/**
+	 * The media title.
+	 */
+	public String title;
 }
