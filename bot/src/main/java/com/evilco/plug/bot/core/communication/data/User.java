@@ -1,5 +1,7 @@
 package com.evilco.plug.bot.core.communication.data;
 
+import com.evilco.plug.bot.core.command.ICommandSender;
+
 /**
  * @auhtor Johannes Donath <johannesd@evil-co.com>
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
@@ -54,7 +56,7 @@ public class User {
 	/**
 	 * Stores the permission level the current user has in the current room.
 	 */
-	public int permission;
+	public PermissionLevel permission;
 
 	/**
 	 * ???
