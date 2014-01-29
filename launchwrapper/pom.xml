@@ -184,6 +184,8 @@
 						<addMavenDescriptor>true</addMavenDescriptor>
 
 						<manifest>
+							<mainClass>com.evilco.plug.bot.launchwrapper.LaunchwrapperApplication</mainClass>
+
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 
