@@ -67,7 +67,7 @@ public class User {
 	/**
 	 * Stores the current availability status of a user.
 	 */
-	public int status;
+	public UserStatus status;
 
 	/**
 	 * ???
