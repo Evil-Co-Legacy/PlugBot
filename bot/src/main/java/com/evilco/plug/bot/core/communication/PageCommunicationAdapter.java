@@ -92,6 +92,11 @@ public class PageCommunicationAdapter {
 	protected JavascriptExecutor executor = null;
 
 	/**
+	 * Caches the Gson instance.
+	 */
+	protected Gson gson = null;
+
+	/**
 	 * Stores the bot user.
 	 */
 	protected User user = null;
@@ -100,6 +105,73 @@ public class PageCommunicationAdapter {
 	 * Caches the current user list.
 	 */
 	protected List<User> userList = new ArrayList<> ();
+
+	/**
+	 * Joins the DJ wait list.
+	 */
+	public void djJoin () {
+		this.getExecutor ().executeScript ("API.djJoin ();");
+	}
+
+	/**
+	 * Leaves the DJ wait list.
+	 */
+	public void djLeave () {
+		this.getExecutor ().executeScript ("API.djLeaver ();");
+	}
+
+	/**
+	 * Returns a list of plug.dj administrators in the channel (if any).
+	 * @return
+	 */
+	public List<User> getAdmins () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getAdmins ());"));
+
+		// create token
+		TypeToken<List<User>> token = new TypeToken<List<User>> () { };
+
+		// decode
+		return this.getGson ().fromJson (data, token.getType ());
+	}
+
+	/**
+	 * Returns a list of plug.dj brand ambassadors in the channel (if any).
+	 * @return
+	 */
+	public List<User> getAmbassadors () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getAmbassadors ());"));
+
+		// create token
+		TypeToken<List<User>> token = new TypeToken<List<User>> () { };
+
+		// decode
+		return this.getGson ().fromJson (data, token.getType ());
+	}
+
+	/**
+	 * Returns a list of users in the channel (excluding DJs).
+	 * @return
+	 */
+	public List<User> getAudience () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getAudience ());"));
+
+		// create token
+		TypeToken<List<User>> token = new TypeToken<List<User>> () { };
+
+		// decode
+		return this.getGson ().fromJson (data, token.getType ());
+	}
+
+	/**
+	 * Returns the current DJ.
+	 * @return
+	 */
+	public User getDj () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getDJ ());"));
+
+		// decode
+		return this.getGson ().fromJson (data, User.class);
+	}
 
 	/**
 	 * Returns the Javascript executor.
@@ -111,11 +183,109 @@ public class PageCommunicationAdapter {
 	}
 
 	/**
+	 * Returns the Gson instance.
+	 * @return
+	 */
+	public Gson getGson () {
+		if (this.gson == null) this.gson = new Gson ();
+		return this.gson;
+	}
+
+	/**
+	 * Returns the room history.
+	 * @return
+	 */
+	public List<HistoryItem> getHistory () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getHistory ());"));
+
+		// create token
+		TypeToken<List<HistoryItem>> token = new TypeToken<List<HistoryItem>> () { };
+
+		// decode
+		return this.getGson ().fromJson (data, token.getType ());
+	}
+
+	/**
+	 * Returns the room host (returns null if the host is currently not in the room).
+	 * @return
+	 */
+	public User getHost () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getHost ());"));
+
+		// decode
+		return this.getGson ().fromJson (data, User.class); // let's hope it's not East. Else our bot might get drunk just by handling his user object ...
+	}
+
+	/**
+	 * Returns the current media (null if nobody is playing).
+	 * @return
+	 */
+	public Media getMedia () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getMedia ());"));
+
+		// decode
+		return this.getGson ().fromJson (data, Media.class);
+	}
+
+	/**
+	 * Returns the current room score.
+	 * @return
+	 */
+	public RoomScore getRoomScore () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getRoomScore ());"));
+
+		// decode
+		return this.getGson ().fromJson (data, RoomScore.class);
+	}
+
+	/**
+	 * Returns the room staff in the room.
+	 * @return
+	 */
+	public List<User> getStaff () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getStaff ());"));
+
+		// get token
+		TypeToken<List<User>> token = new TypeToken<List<User>> () { };
+
+		// decode
+		return this.getGson ().fromJson (data, token.getType ());
+	}
+
+	/**
+	 * Returns the elapsed media time.
+	 * @return
+	 */
+	public long getTimeElapsed () {
+		return ((long) this.getExecutor ().executeScript ("return API.getTimeElapsed ();"));
+	}
+
+	/**
+	 * Returns the remaining media time.
+	 * @return
+	 */
+	public long getTimeRemaining () {
+		return ((long) this.getExecutor ().executeScript ("return API.getTimeRemaining ();"));
+	}
+
+	/**
 	 * Returns the current bot user.
 	 * @return
 	 */
 	public User getUser () {
 		return this.user;
+	}
+
+	/**
+	 * Returns a user based on their userID (returns null if the user is not online).
+	 * @param userID
+	 * @return
+	 */
+	public User getUser (String userID) {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getUser (arguments[0]));", userID));
+
+		// decode
+		return this.getGson ().fromJson (data, User.class);
 	}
 
 	/**
@@ -125,6 +295,56 @@ public class PageCommunicationAdapter {
 	@Bean (name = "userList")
 	public List<User> getUserList () {
 		return this.userList;
+	}
+
+	/**
+	 * Returns the room wait list.
+	 * @return
+	 */
+	public List<User> getWaitList () {
+		String data = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getWaitList ());"));
+
+		// create token
+		TypeToken<List<User>> token = new TypeToken<List<User>> () { };
+
+		// decode
+		return this.getGson ().fromJson (data, token.getType ());
+	}
+
+	/**
+	 * Returns the wait list position of the current user.
+	 * @return
+	 */
+	public int getWaitListPosition () {
+		return ((int) this.getExecutor ().executeScript ("return API.getWaitListPosition ();"));
+	}
+
+	/**
+	 * Returns the wait list position of a specific user (-1 if not in the wait list).
+	 * @param userID
+	 * @return
+	 */
+	public int getWaitListPosition (String userID) {
+		return ((int) this.getExecutor ().executeScript ("return API.getWaitListPosition (arguments[0]);", userID));
+	}
+
+	/**
+	 * Checks whether the current user has a specific permission level.
+	 * @param level
+	 * @return
+	 */
+	public boolean hasPermission (PermissionLevel level) {
+		return ((boolean) this.getExecutor ().executeScript ("return API.hasPermission (null, arguments[0]);", level.representation));
+	}
+
+	/**
+	 * Checks whether the specified user has a specific permission level.
+	 * @param userID
+	 * @param level
+	 * @return
+	 */
+	public boolean hasPermission (String userID, PermissionLevel level) {
+		return ((boolean) this.getExecutor ().executeScript ("return API.hasPermission (arguments[0], arguments[1]);", userID, level.representation));
 	}
 
 	/**
@@ -184,6 +404,97 @@ public class PageCommunicationAdapter {
 	}
 
 	/**
+	 * Adds a DJ to the waitlist.
+	 * @param userID
+	 */
+	public void moderateAddDj (String userID) {
+		this.getExecutor ().executeScript ("API.moderateAddDJ (arguments[0]);", userID);
+	}
+
+	/**
+	 * Bans a user from the room.
+	 * @param userID
+	 * @param reason
+	 * @param duration
+	 */
+	public void moderateBanUser (String userID, String reason, BanDuration duration) {
+		this.getExecutor ().executeScript ("API.moderateBanUser (arguments[0], arguments[1], arguments[2]);", userID, reason, duration.representation);
+	}
+
+	/**
+	 * Deletes a chat message.
+	 * @param chatID
+	 */
+	public void moderateDeleteChat (String chatID) {
+		this.getExecutor ().executeScript ("API.moderateDeleteChat (arguments[0]);", chatID);
+	}
+
+	/**
+	 * Skips a track.
+	 */
+	public void moderateForceSkip () {
+		this.getExecutor ().executeScript ("API.moderateForceSkip ();");
+	}
+
+	/**
+	 * (Un-)Locks the wait list.
+	 * @param value
+	 * @param removeAll
+	 */
+	public void moderateLockWaitList (boolean value, boolean removeAll) {
+		this.getExecutor ().executeScript ("API.moderateLockWaitList (arguments[0], arguments[1]);", value, removeAll);
+	}
+
+	/**
+	 * Locks the wait list.
+	 * @param removeAll
+	 */
+	public void moderateLockWaitList (boolean removeAll) {
+		this.moderateLockWaitList (true, removeAll);
+	}
+
+	/**
+	 * Moves a DJ to a specific position in the wait list.
+	 * @param userID
+	 * @param position
+	 */
+	public void moderateMoveDj (String userID, int position) {
+		this.getExecutor ().executeScript ("API.moderateMoveDJ (arguments[0], arguments[1]);", userID, position);
+	}
+
+	/**
+	 * Removes a DJ from the wait list.
+	 * @param userID
+	 */
+	public void moderateRemoveDj (String userID) {
+		this.getExecutor ().executeScript ("API.moderateRemoveDJ (arguments[0]);", userID);
+	}
+
+	/**
+	 * Sets the permission level of a user.
+	 * @param userID
+	 * @param permission
+	 */
+	public void moderateSetRole (String userID, PermissionLevel permission) {
+		this.getExecutor ().executeScript ("API.moderateSetRole (arguments[0], arguments[1]);", userID, permission.representation);
+	}
+
+	/**
+	 * Unbans a user.
+	 * @param userID
+	 */
+	public void moderateUnbanUser (String userID) {
+		this.getExecutor ().executeScript ("API.moderateUnbanUser (arguments[0]);", userID);
+	}
+
+	/**
+	 * Unlocks the wait list.
+	 */
+	public void moderateUnlockWaitList () {
+		this.moderateLockWaitList (false, false);
+	}
+
+	/**
 	 * Polls updates to our own user object.
 	 */
 	@Scheduled (fixedRate = 20000)
@@ -195,7 +506,7 @@ public class PageCommunicationAdapter {
 		String userData = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getUser ());"));
 
 		// de-serialize data
-		this.user = (new Gson ()).fromJson (userData, User.class);
+		this.user = this.getGson ().fromJson (userData, User.class);
 	}
 
 	/**
@@ -256,7 +567,7 @@ public class PageCommunicationAdapter {
 			ApplicationEvent event = null;
 
 			// create gson instance
-			Gson gson = new Gson ();
+			Gson gson = this.getGson ();
 
 			// decode all events
 			try {
@@ -503,7 +814,7 @@ public class PageCommunicationAdapter {
 
 		try {
 			// decode data
-			List<User> userList = (new Gson ()).fromJson (userListData, token.getType ());
+			List<User> userList = this.getGson ().fromJson (userListData, token.getType ());
 
 			// clear list
 			this.userList.clear ();
@@ -513,5 +824,42 @@ public class PageCommunicationAdapter {
 		} catch (Exception ex) {
 			logger.severe ("Could not poll internal user list cache. This might be a bug.");
 		}
+	}
+
+	/**
+	 * Sends a message to chat.
+	 * @param message
+	 */
+	public void sendChat (String message) {
+		this.getExecutor ().executeScript ("API.sendMessage (arguments[0]);", message);
+	}
+
+	/**
+	 * Sets the availability status.
+	 * @param status
+	 */
+	public void setStatus (UserStatus status) {
+		this.getExecutor ().executeScript ("API.setStatus (arguments[0]);", status.representation);
+	}
+
+	/**
+	 * Curates (grabs) a track.
+	 */
+	public void voteCurate () {
+		this.driver.findElement (By.id ("curate")).click ();
+	}
+
+	/**
+	 * Votes negative (mehs) on a track.
+	 */
+	public void voteNegative () {
+		this.driver.findElement (By.id ("meh")).click ();
+	}
+
+	/**
+	 * Votes positive (woots) on a track.
+	 */
+	public void votePositive () {
+		this.driver.findElement (By.id ("woot")).click ();
 	}
 }
