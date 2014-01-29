@@ -36,6 +36,14 @@ public class UserCommandSender extends User implements ICommandSender {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean hasPermission (PermissionLevel level) {
+		return this.adapter.hasPermission (this.id, level);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void sendMessage (String message) {
 		this.adapter.sendChat ("@" + this.username + " " + message);
 	}
