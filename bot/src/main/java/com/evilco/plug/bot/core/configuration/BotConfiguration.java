@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 @Component
 @XmlRootElement (name = "configuration", namespace = BotConfiguration.NAMESPACE)
-@XmlType (propOrder = {"account", "driver"})
+@XmlType (propOrder = {"room", "account", "driver"})
 public class BotConfiguration {
 
 	/**
@@ -53,6 +53,11 @@ public class BotConfiguration {
 	 */
 	@XmlElement (name = "driver", namespace = NAMESPACE)
 	public DriverConfiguration driver = new DriverConfiguration ();
+
+	/**
+	 * Defines the room to join.
+	 */
+	public String room = "evil-co";
 
 	/**
 	 * Protected Constructor.
