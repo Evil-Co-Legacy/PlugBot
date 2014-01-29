@@ -54,6 +54,8 @@ public class CommandManager {
 			return true;
 		} catch (CommandUsageException ex) {
 			sender.sendMessage ("Usage: " + this.commandMap.get (alias).getUsage ());
+		} catch (CommandPermissionException ex) {
+			sender.sendMessage ("You need more permissions to execute this command.");
 		} catch (CommandException ex) {
 			sender.sendMessage ("An internal error occured while executing the command.");
 			logger.log (Level.SEVERE, "Could not execute command with alias \"" + alias + "\".", ex);
