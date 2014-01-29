@@ -14,8 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +38,11 @@ import java.util.logging.Logger;
 @EnableScheduling
 @DependsOn ("driver")
 public class PageCommunicationAdapter {
+
+	/**
+	 * Defines the text a dialog window has to have to cause an application crash.
+	 */
+	public static final String CONNECTION_ERROR_TEXT = "Connection Error";
 
 	/**
 	 * Stores the internal logger.
@@ -68,6 +72,11 @@ public class PageCommunicationAdapter {
 	protected JavascriptExecutor executor = null;
 
 	/**
+	 * Stores the bot user.
+	 */
+	protected User user = null;
+
+	/**
 	 * Caches the current user list.
 	 */
 	protected List<User> userList = new ArrayList<> ();
@@ -79,6 +88,14 @@ public class PageCommunicationAdapter {
 	public JavascriptExecutor getExecutor () {
 		if (this.executor == null) this.executor = ((JavascriptExecutor) this.driver);
 		return this.executor;
+	}
+
+	/**
+	 * Returns the current bot user.
+	 * @return
+	 */
+	public User getUser () {
+		return this.user;
 	}
 
 	/**
@@ -109,6 +126,9 @@ public class PageCommunicationAdapter {
 		// disable sound output
 		this.executor.executeScript ("API.setVolume (0);");
 
+		// read user
+		this.pollUser ();
+
 		// enable
 		this.enabled = true;
 	}
@@ -119,6 +139,46 @@ public class PageCommunicationAdapter {
 	 */
 	public boolean isApiReady () {
 		return ((Boolean) this.getExecutor ().executeScript ("return (window.API != undefined && window.API != null && window.API.enabled);"));
+	}
+
+	/**
+	 * Polls updates to our own user object.
+	 */
+	@Scheduled (fixedRate = 20000)
+	public void pollUser () {
+		// disabled?
+		if (!this.enabled) return;
+
+		// get json
+		String userData = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getUser ());"));
+
+		// deserialize data
+		this.user = (new Gson ()).fromJson (userData, User.class);
+	}
+
+	/**
+	 * Checks whether the connection is still available.
+	 */
+	@Scheduled (fixedRate = 120000)
+	public void pollConnectionErrors () {
+		// wait
+		if (!this.enabled) return;
+
+		// log
+		logger.info ("Checking whether connection is still alive ...");
+
+		// search for the crash dialog
+		WebElement element = null;
+
+		try {
+			this.driver.findElement (By.cssSelector ("#dialog-alert > .dialog-frame > .title"));
+		} catch (NoSuchElementException ignore) { }
+
+		// check state
+		if (element != null && element.getText () == CONNECTION_ERROR_TEXT) throw new RuntimeException ("The connection to plug.dj has been terminated. The state of the application is unclear.");
+
+		// log
+		logger.info ("The connection is still alive.");
 	}
 
 	/**
