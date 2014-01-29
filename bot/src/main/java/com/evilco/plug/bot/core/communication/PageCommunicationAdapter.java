@@ -1,12 +1,10 @@
 package com.evilco.plug.bot.core.communication;
 
-import com.evilco.plug.bot.core.communication.data.HistoryItem;
-import com.evilco.plug.bot.core.communication.data.Media;
-import com.evilco.plug.bot.core.communication.data.RoomScore;
-import com.evilco.plug.bot.core.communication.data.User;
+import com.evilco.plug.bot.core.communication.data.*;
 import com.evilco.plug.bot.core.event.EventManager;
 import com.evilco.plug.bot.core.event.communication.dj.*;
 import com.evilco.plug.bot.core.event.communication.room.*;
+import com.evilco.plug.bot.core.event.communication.room.message.*;
 import com.evilco.plug.bot.core.event.communication.score.CurateUpdateEvent;
 import com.evilco.plug.bot.core.event.communication.score.VoteUpdateEvent;
 import com.evilco.plug.bot.core.event.communication.user.UserFanEvent;
@@ -25,7 +23,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +40,16 @@ import java.util.logging.Logger;
 public class PageCommunicationAdapter {
 
 	/**
+	 * Defines the minimal amount of interactions a user needs to get blocked automatically.
+	 */
+	public static final int BLACKLIST_INTERACTION_AMOUNT = 5;
+
+	/**
+	 * Defines the time which needs to pass for an interaction to be removed.
+	 */
+	public static final int BLACKLIST_TIMEOUT = 20000;
+
+	/**
 	 * Defines the text a dialog window has to have to cause an application crash.
 	 */
 	public static final String CONNECTION_ERROR_TEXT = "Connection Error";
@@ -48,6 +58,16 @@ public class PageCommunicationAdapter {
 	 * Stores the internal logger.
 	 */
 	protected static final Logger logger = Logger.getLogger ("PageCommunicationAdapter");
+
+	/**
+	 * Stores the command blacklist.
+	 */
+	protected Map<String, Long> blacklist = new HashMap<String, Long> ();
+
+	/**
+	 * Stores the command interaction blacklist.
+	 */
+	protected Map<String, Integer> blacklistInteractionMap = new HashMap<String, Integer> ();
 
 	/**
 	 * Caches the web driver.
@@ -142,6 +162,28 @@ public class PageCommunicationAdapter {
 	}
 
 	/**
+	 * Clears the blacklist.
+	 */
+	@Scheduled (fixedRate = 5000)
+	public void clearBlacklist () {
+		for (Map.Entry<String, Long> blacklistTimeout : this.blacklist.entrySet ()) {
+			if (blacklistTimeout.getValue () <= System.currentTimeMillis ()) {
+				if (this.blacklistInteractionMap.get (blacklistTimeout.getKey ()) > 1) {
+					// get value
+					int interactions = this.blacklistInteractionMap.get (blacklistTimeout.getKey ());
+
+					// update value
+					this.blacklistInteractionMap.put (blacklistTimeout.getKey (), (interactions - 1));
+					this.blacklist.put (blacklistTimeout.getKey (), (System.currentTimeMillis () + BLACKLIST_TIMEOUT));
+				} else {
+					this.blacklist.remove (blacklistTimeout.getKey ());
+					this.blacklistInteractionMap.remove (blacklistTimeout.getKey ());
+				}
+			}
+		}
+	}
+
+	/**
 	 * Polls updates to our own user object.
 	 */
 	@Scheduled (fixedRate = 20000)
@@ -152,7 +194,7 @@ public class PageCommunicationAdapter {
 		// get json
 		String userData = ((String) this.getExecutor ().executeScript ("return JSON.stringify (API.getUser ());"));
 
-		// deserialize data
+		// de-serialize data
 		this.user = (new Gson ()).fromJson (userData, User.class);
 	}
 
@@ -223,6 +265,7 @@ public class PageCommunicationAdapter {
 
 				// parse for most event types (some types use their own parsing mechanism and are ignored here).
 				switch (type) {
+					case CHAT:
 					case DJ_UPDATE:
 					case FAN_JOIN:
 					case FRIEND_JOIN:
@@ -246,7 +289,55 @@ public class PageCommunicationAdapter {
 
 				switch (type) {
 					case CHAT:
-						// TODO: Command management
+						// decode
+						Message message = gson.fromJson (eventData, Message.class);
+
+						// verify type
+						switch (message.type) {
+							case EMOTE:
+								event = new EmoteMessageEvent (this, message);
+								break;
+							case MODERATION:
+								event = new ModerationMessageEvent (this, message);
+								break;
+							case SYSTEM:
+								event = new SystemMessageEvent (this, message);
+								break;
+							default:
+								// verify source
+								if (message.fromID == this.user.id) {
+									event = new BotMessageEvent (this, message);
+									break;
+								}
+
+								// split up message
+								String[] messageEx = message.message.split (" ");
+
+								// check contents
+								if (messageEx.length >= 1 && messageEx[0].equalsIgnoreCase ("@" + this.user.username)) {
+									if (this.blacklistInteractionMap.containsKey (message.fromID) && this.blacklistInteractionMap.get (message.fromID) >= BLACKLIST_INTERACTION_AMOUNT) {
+										logger.info ("Ignored message from user " + message.from + " (" + message.fromID + "): User has been blacklisted for spamming.");
+										break;
+									}
+
+									// TODO: Parse & execute command
+
+									// update blacklist interaction
+									this.blacklist.put (message.fromID, (System.currentTimeMillis () + BLACKLIST_TIMEOUT));
+
+									if (this.blacklistInteractionMap.containsKey (message.fromID))
+										this.blacklistInteractionMap.put (message.fromID, 1);
+									else
+										this.blacklistInteractionMap.put (message.fromID, (this.blacklistInteractionMap.get (message.fromID) + 1));
+
+									// stop execution
+									break;
+								}
+
+								// fire event
+								event = new UserMessageEvent (this, message);
+								break;
+						}
 						break;
 					case CHAT_COMMAND:
 						logger.warning ("Chat commands are not supported in PlugBot.");
