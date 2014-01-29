@@ -8,20 +8,33 @@ import com.google.gson.annotations.SerializedName;
  */
 public enum PermissionLevel {
 	@SerializedName ("0")
-	NONE,
+	NONE (0),
 	@SerializedName ("1")
-	RESIDENT_DJ,
+	RESIDENT_DJ (1),
 	@SerializedName ("2")
-	BOUNCER,
+	BOUNCER (2),
 	@SerializedName ("3")
-	MANAGER,
+	MANAGER (3),
 	@SerializedName ("4")
-	CO_HOST,
+	CO_HOST (4),
 	@SerializedName ("5")
-	HOST,
+	HOST (5),
 
 	@SerializedName ("8")
-	AMBASSADOR,
+	AMBASSADOR (8),
 	@SerializedName ("10")
-	ADMIN
+	ADMIN (10);
+
+	/**
+	 * Stores the integer representation of a permission level.
+	 */
+	public final int representation;
+
+	/**
+	 * Constructs a new Permission Level.
+	 * @param representation
+	 */
+	private PermissionLevel (int representation) {
+		this.representation = representation;
+	}
 }
