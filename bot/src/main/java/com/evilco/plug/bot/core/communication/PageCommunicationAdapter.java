@@ -1,5 +1,8 @@
 package com.evilco.plug.bot.core.communication;
 
+import com.evilco.plug.bot.core.command.CommandManager;
+import com.evilco.plug.bot.core.command.CommandNotFoundException;
+import com.evilco.plug.bot.core.command.ICommandSender;
 import com.evilco.plug.bot.core.communication.data.*;
 import com.evilco.plug.bot.core.event.EventManager;
 import com.evilco.plug.bot.core.event.communication.dj.*;
@@ -13,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Bean;
@@ -22,10 +26,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,6 +69,12 @@ public class PageCommunicationAdapter {
 	 * Stores the command interaction blacklist.
 	 */
 	protected Map<String, Integer> blacklistInteractionMap = new HashMap<String, Integer> ();
+
+	/**
+	 * Caches the command manager instance.
+	 */
+	@Autowired
+	protected CommandManager commandManager;
 
 	/**
 	 * Caches the web driver.
@@ -631,15 +638,28 @@ public class PageCommunicationAdapter {
 										break;
 									}
 
-									// TODO: Parse & execute command
+									// get message list
+									ArrayList<String> arguments = new ArrayList<> (Arrays.asList (messageEx));
 
-									// update blacklist interaction
-									this.blacklist.put (message.fromID, (System.currentTimeMillis () + BLACKLIST_TIMEOUT));
+									// remove @PlugBot
+									arguments.remove (0);
 
-									if (this.blacklistInteractionMap.containsKey (message.fromID))
-										this.blacklistInteractionMap.put (message.fromID, 1);
-									else
-										this.blacklistInteractionMap.put (message.fromID, (this.blacklistInteractionMap.get (message.fromID) + 1));
+									// construct command sender
+									ICommandSender sender = new UserCommandSender (this, this.getUser (message.fromID));
+
+									try {
+										this.commandManager.dispatch (sender, ((String[]) arguments.toArray ()));
+									} catch (CommandNotFoundException ex) {
+										sender.sendMessage ("Unknown command.");
+
+										// update blacklist interaction
+										this.blacklist.put (message.fromID, (System.currentTimeMillis () + BLACKLIST_TIMEOUT));
+
+										if (this.blacklistInteractionMap.containsKey (message.fromID))
+											this.blacklistInteractionMap.put (message.fromID, 1);
+										else
+											this.blacklistInteractionMap.put (message.fromID, (this.blacklistInteractionMap.get (message.fromID) + 1));
+									}
 
 									// stop execution
 									break;
