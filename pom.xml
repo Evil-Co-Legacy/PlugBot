@@ -16,5 +16,6 @@
 	<modules>
 		<module>bot</module>
 		<module>launchwrapper</module>
+		<module>plugins/AutoWoot</module>
 	</modules>
 </project>
