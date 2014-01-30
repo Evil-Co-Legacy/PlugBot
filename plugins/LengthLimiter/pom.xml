@@ -14,8 +14,8 @@
 	<artifactId>LengthLimiter</artifactId>
 
 	<!-- Artifact Metadata -->
-	<name>AutoWoot Plugin</name>
-	<description>let's the bot automatically woot on tracks.</description>
+	<name>Length Limiter Plugin</name>
+	<description>Automatically checks each track against the room history.</description>
 	<inceptionYear>2014</inceptionYear>
 
 	<!-- Organization Metadata -->
