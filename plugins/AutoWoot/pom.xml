@@ -90,7 +90,7 @@
 
 	<!-- Build Setup -->
 	<build>
-		<finalName>plugin-AutoWoot-${project.version}</finalName>
+		<finalName>plugin-${project.artifactId}-${project.version}</finalName>
 
 		<!-- Build Properties -->
 		<defaultGoal>clean package</defaultGoal>
