@@ -4,6 +4,9 @@ import com.evilco.plug.bot.core.plugin.annotation.Plugin;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -16,6 +19,11 @@ import java.util.Set;
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
 public class PluginClassLoader extends URLClassLoader {
+
+	/**
+	 * Stores the internal plugin context.
+	 */
+	protected AnnotationConfigApplicationContext context;
 
 	/**
 	 * Stores the plugin file.
@@ -39,7 +47,7 @@ public class PluginClassLoader extends URLClassLoader {
 	 * @throws MalformedURLException
 	 * @throws PluginLoaderException
 	 */
-	public PluginClassLoader (final File file, final ClassLoader parent) throws MalformedURLException, PluginLoaderException {
+	public PluginClassLoader (final File file, final ClassLoader parent, ApplicationContext applicationContext) throws MalformedURLException, PluginLoaderException {
 		super ((new URL[] {file.toURI ().toURL ()}), parent);
 
 		// store properties
@@ -67,15 +75,27 @@ public class PluginClassLoader extends URLClassLoader {
 			throw new PluginLoaderException (ex);
 		}
 
-		// create a new instace
-		try {
-			this.plugin = pluginClass.newInstance ();
-			this.metadata = pluginClass.getAnnotation (Plugin.class);
-		} catch (InstantiationException ex) {
-			throw new PluginLoaderException (ex);
-		} catch (IllegalAccessException ex) {
-			throw new PluginLoaderException (ex);
-		}
+		// construct context
+		this.context = new AnnotationConfigApplicationContext ();
+		this.context.setParent (applicationContext);
+		this.context.setClassLoader (this);
+		
+		this.context.register (pluginClass);
+
+		// refresh
+		this.context.refresh ();
+
+		// get an instance
+		this.plugin = this.context.getBean (pluginClass);
+		this.metadata = pluginClass.getAnnotation (Plugin.class);
+	}
+
+	/**
+	 * Returns the plugin context.
+	 * @return
+	 */
+	public ApplicationContext getContext () {
+		return this.context;
 	}
 
 	/**
