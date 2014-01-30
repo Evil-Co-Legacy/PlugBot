@@ -79,7 +79,7 @@ public class PluginClassLoader extends URLClassLoader {
 		this.context = new AnnotationConfigApplicationContext ();
 		this.context.setParent (applicationContext);
 		this.context.setClassLoader (this);
-		
+
 		this.context.register (pluginClass);
 
 		// refresh
