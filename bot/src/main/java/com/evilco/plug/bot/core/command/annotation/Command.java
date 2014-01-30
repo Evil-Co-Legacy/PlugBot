@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
 @Retention (RetentionPolicy.RUNTIME)
-@Target (ElementType.TYPE)
+@Target (ElementType.METHOD)
 public @interface Command {
 
 	/**
