@@ -251,9 +251,6 @@ public class Bot implements Runnable, ApplicationContextAware {
 
 		// start interface
 		this.joinRoom ();
-
-		// block thread
-		while (this.isAlive) { }
 	}
 
 	/**
