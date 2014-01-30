@@ -5,8 +5,14 @@ import com.evilco.plug.bot.core.event.EventManager;
 import com.evilco.plug.bot.core.event.plugin.PluginLoadEvent;
 import com.evilco.plug.bot.core.event.plugin.PluginUnloadEvent;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +29,7 @@ import java.util.logging.Logger;
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
 @Component
-public class PluginManager {
+public class PluginManager implements ApplicationContextAware {
 
 	/**
 	 * Defines the default plugin directory.
@@ -34,6 +40,11 @@ public class PluginManager {
 	 * Stores the internal logging instance.
 	 */
 	protected static final Logger logger = Logger.getLogger ("PluginManager");
+
+	/**
+	 * Caches the application context.
+	 */
+	protected ApplicationContext applicationContext = null;
 
 	/**
 	 * Caches the current bot instance.
@@ -105,7 +116,7 @@ public class PluginManager {
 		PluginClassLoader loader = null;
 
 		try {
-			loader = new PluginClassLoader (pluginFile, this.getClass ().getClassLoader ());
+			loader = new PluginClassLoader (pluginFile, this.getClass ().getClassLoader (), this.applicationContext);
 		} catch (MalformedURLException ex) {
 			throw new PluginLoaderException (ex);
 		}
@@ -172,6 +183,27 @@ public class PluginManager {
 	}
 
 	/**
+	 * Forwards events into plugins.
+	 * @param event
+	 */
+	public void onApplicationEvent (ApplicationEvent event) {
+		logger.finest ("Forwarding event of type " + event.getClass ().getCanonicalName () + " to plugin contexts.");
+
+		// forward
+		for (Map.Entry<String, PluginClassLoader> plugin : this.pluginMap.entrySet ()) {
+			plugin.getValue ().getContext ().publishEvent (event);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setApplicationContext (ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	/**
 	 * Unloads a plugin.
 	 * @param name
 	 */
@@ -190,8 +222,11 @@ public class PluginManager {
 		PluginUnloadEvent event = new PluginUnloadEvent (plugin);
 		this.eventManager.fireEvent (event);
 
-		// delete internal plugin instace
+		// delete internal plugin instance
 		plugin = null;
+
+		// close context
+		((AnnotationConfigApplicationContext) this.pluginMap.get (name).getContext ()).destroy ();
 
 		// log
 		logger.info ("Unloading plugin \"" + this.pluginMap.get (name).getMetadata ().name () + "\" ...");
