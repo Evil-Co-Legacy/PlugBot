@@ -9,7 +9,6 @@ import com.evilco.plug.bot.core.plugin.PluginException;
 import com.evilco.plug.bot.core.plugin.annotation.Plugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
