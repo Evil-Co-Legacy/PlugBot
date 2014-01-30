@@ -61,9 +61,6 @@ public class PluginManager {
 
 		// create map
 		this.pluginMap = new HashMap<String, PluginClassLoader> ();
-
-		// load all plugins
-		this.loadAll ();
 	}
 
 	/**
