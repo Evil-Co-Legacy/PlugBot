@@ -65,22 +65,6 @@ public class CoreBeanConfiguration {
 		}
 	}
 
-	@Bean (name = "Bot")
-	@Scope ("singleton")
-	public Bot bot () {
-		return new Bot ();
-	}
-
-	/**
-	 * Constructs a new command manager.
-	 * @return
-	 */
-	@Bean
-	@Scope ("singleton")
-	public CommandManager commandManager () {
-		return (new CommandManager ());
-	}
-
 	/**
 	 * Constructs a new bot configuration.
 	 * @return
@@ -156,35 +140,5 @@ public class CoreBeanConfiguration {
 
 		// return the driver instance
 		return driver;
-	}
-
-	/**
-	 * Constructs a new event manager.
-	 * @return
-	 */
-	@Bean
-	@Scope ("singleton")
-	public EventManager eventManager () {
-		return (new EventManager ());
-	}
-
-	/**
-	 * Constructs a new page communication adapter.
-	 * @return
-	 */
-	@Bean
-	@Scope ("singleton")
-	public PageCommunicationAdapter pageCommunicationAdapter () {
-		return (new PageCommunicationAdapter ());
-	}
-
-	/**
-	 * Constructs a new plugin manager.
-	 * @return
-	 */
-	@Bean
-	@Scope ("singleton")
-	public PluginManager pluginManager () {
-		return (new PluginManager ());
 	}
 }
