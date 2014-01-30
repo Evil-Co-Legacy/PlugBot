@@ -12,9 +12,11 @@ import com.evilco.plug.bot.core.event.communication.score.CurateUpdateEvent;
 import com.evilco.plug.bot.core.event.communication.score.VoteUpdateEvent;
 import com.evilco.plug.bot.core.event.communication.user.UserFanEvent;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ import java.util.logging.Logger;
  * @auhtor Johannes Donath <johannesd@evil-co.com>
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
-@Component
+@Component ("pageCommunicationAdapter")
 @Configuration
 @EnableScheduling
 @DependsOn ("driver")
@@ -579,7 +581,7 @@ public class PageCommunicationAdapter {
 			// decode all events
 			try {
 				// parse data
-				JSONObject object = null;
+				JsonObject object = null;
 
 				// parse for most event types (some types use their own parsing mechanism and are ignored here).
 				switch (type) {
@@ -598,7 +600,8 @@ public class PageCommunicationAdapter {
 					case WAIT_LIST_UPDATE: break;
 
 					default:
-						gson.fromJson (eventData, JSONObject.class);
+						JsonParser parser = new JsonParser ();
+						object = parser.parse (eventData).getAsJsonObject ();
 				}
 
 				// define common objects (work around context bug)
@@ -678,21 +681,21 @@ public class PageCommunicationAdapter {
 						break;
 					case CURATE_UPDATE:
 						// extract user property
-						user = gson.fromJson (object.getJSONObject ("user").toString (), User.class);
+						user = gson.fromJson (object.get ("user").toString (), User.class);
 
 						// construct event
 						event = new CurateUpdateEvent (this, user);
 						break;
 					case DJ_ADVANCE:
 						// check whether booth is empty
-						if (object == null) {
+						if (object == null || object.get ("dj") == null) {
 							event = new DjBoothEmptyEvent (this);
 							break;
 						}
 
 						// extract main data
-						user = gson.fromJson (object.getJSONObject ("dj").toString (), User.class);
-						media = gson.fromJson (object.getJSONObject ("media").toString (), Media.class);
+						user = gson.fromJson (object.get ("dj").toString (), User.class);
+						media = gson.fromJson (object.get ("media").toString (), Media.class);
 
 						// construct event
 						event = new DjAdvanceEvent (this, user, media);
@@ -779,8 +782,8 @@ public class PageCommunicationAdapter {
 						break;
 					case VOTE_UPDATE:
 						// deserialize data
-						int vote = object.getInt ("vote");
-						user = gson.fromJson (object.getJSONObject ("user").toString (), User.class);
+						int vote = object.get ("vote").getAsInt ();
+						user = gson.fromJson (object.get ("user").toString (), User.class);
 
 						// construct event
 						event = new VoteUpdateEvent (this, user, vote);
@@ -799,9 +802,6 @@ public class PageCommunicationAdapter {
 						logger.severe ("Received an unhandled event of type " + type.toString () + ". This is a bug!");
 						break;
 				}
-			} catch (JSONException ex) {
-				logger.log (Level.WARNING, "Skipping event of type " + type.toString () + ": The json string could not be decoded.", ex);
-				continue;
 			} catch (Exception ex) {
 				logger.log (Level.SEVERE, "Skipping event of type " + type.toString () + ": An exception occurred during parsing and dispatching the event.", ex);
 				continue;
