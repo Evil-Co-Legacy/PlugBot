@@ -14,6 +14,7 @@ import org.springframework.shell.Bootstrap;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -97,9 +98,6 @@ public class LaunchwrapperApplication implements ApplicationContextAware {
 		// create new thread
 		this.thread = new BotThread (this.bot);
 
-		// register the error handler
-		this.thread.setUncaughtExceptionHandler ((new LaunchwrapperErrorHandler ()));
-
 		// start thread
 		this.thread.start ();
 	}
@@ -156,32 +154,5 @@ public class LaunchwrapperApplication implements ApplicationContextAware {
 
 		// suggest a garbage collection
 		System.gc ();
-	}
-
-	/**
-	 * Handles problems with bots.
-	 */
-	public class LaunchwrapperErrorHandler implements Thread.UncaughtExceptionHandler {
-
-		/**
-		 * Protected constructor.
-		 */
-		private LaunchwrapperErrorHandler () { }
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void uncaughtException (Thread t, Throwable e) {
-			// try to shutdown the bot
-			shutdown ();
-
-			// report
-			reportCrash (e);
-
-			// restart bot
-			initiateBot ();
-			thread.start ();
-		}
 	}
 }
