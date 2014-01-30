@@ -1,5 +1,7 @@
 package com.evilco.plug.bot.core.event;
 
+import com.evilco.plug.bot.core.plugin.PluginManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -20,6 +22,12 @@ public class EventManager implements ApplicationEventPublisherAware {
 	protected static final Logger logger = Logger.getLogger ("EventManager");
 
 	/**
+	 * Caches the plugin manager instance.
+	 */
+	@Autowired
+	protected PluginManager pluginManager;
+
+	/**
 	 * Stores the application event publisher.
 	 */
 	protected ApplicationEventPublisher publisher = null;
@@ -33,6 +41,9 @@ public class EventManager implements ApplicationEventPublisherAware {
 
 		// fire
 		this.publisher.publishEvent (event);
+
+		// publish event to plugin system
+		this.pluginManager.onApplicationEvent (event);
 	}
 
 	/**
