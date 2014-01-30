@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>parent</artifactId>
+		<groupId>com.evilco.plug.bot</groupId>
+		<version>2.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.evilco.plug.bot.plugins</groupId>
+	<artifactId>LengthLimiter</artifactId>
+
+	<!-- Artifact Metadata -->
+	<name>AutoWoot Plugin</name>
+	<description>let's the bot automatically woot on tracks.</description>
+	<inceptionYear>2014</inceptionYear>
+
+	<!-- Organization Metadata -->
+	<organization>
+		<name>Evil-Co</name>
+		<url>http://www.evil-co.org</url>
+	</organization>
+
+	<!-- Contributor Metadata -->
+	<contributors>
+		<contributor>
+			<name>Johannes "Akkarin" Donath</name>
+			<email>johannesd@evil-co.com</email>
+			<timezone>Europe/Berlin</timezone>
+
+			<!-- Roles -->
+			<roles>
+				<role>Project Maintainer</role>
+				<role>Developer</role>
+			</roles>
+
+			<!-- Organization -->
+			<organization>Evil-Co</organization>
+			<organizationUrl>http://www.evil-co.org</organizationUrl>
+		</contributor>
+	</contributors>
+
+	<!-- License Metadata -->
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License</name>
+			<url>http://www.gnu.org/licenses/lgpl.txt</url>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
+
+	<!-- CI Management -->
+	<ciManagement>
+		<system>Atlassian Bamboo</system>
+		<url>http://www.evil-co.com/ci</url>
+	</ciManagement>
+
+	<!-- Issue Management -->
+	<issueManagement>
+		<system>Atlassian JIRA</system>
+		<url>http://evilco.atlassian.net</url>
+	</issueManagement>
+
+	<!-- VCS -->
+	<scm>
+		<connection>scm:git:git://github.com/LordAkkarin/PlugBot.git</connection>
+		<developerConnection>scm:git:git://git@github.com/LordAkkarin/PlugBot.git</developerConnection>
+		<url>https://github.com/LordAkkarin/PlugBot</url>
+		<tag>2.0</tag>
+	</scm>
+
+	<!-- Dependencies -->
+	<dependencies>
+		<!-- PlugBot Core -->
+		<dependency>
+			<groupId>com.evilco.plug.bot</groupId>
+			<artifactId>core</artifactId>
+			<version>${parent.version}</version>
+		</dependency>
+	</dependencies>
+
+	<!-- Environment Variables -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<!-- Build Setup -->
+	<build>
+		<finalName>plugin-${project.artifactId}-${project.version}</finalName>
+
+		<!-- Build Properties -->
+		<defaultGoal>clean package</defaultGoal>
+		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+		<testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+
+		<!-- Application Resources -->
+		<resources>
+			<!-- . -->
+			<resource>
+				<directory>${basedir}/../..</directory>
+				<targetPath>.</targetPath>
+
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<!-- Build Plugins -->
+		<plugins>
+			<!-- Java Compiler -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+
+				<!-- Plugin Configuration -->
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
+			<!-- Jar Creation -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+
+				<!-- Plugin Configuration -->
+				<configuration>
+					<archive>
+						<addMavenDescriptor>true</addMavenDescriptor>
+
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- Copy Dependencies -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+
+				<!-- Plugin Executions -->
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+
+						<!-- Execution Configuration -->
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Build Profiles -->
+	<profiles>
+		<!-- Release Profile -->
+		<profile>
+			<id>release</id>
+
+			<!-- TODO -->
+		</profile>
+	</profiles>
+</project>
