@@ -9,10 +9,10 @@ public interface IPlugin {
 	/**
 	 * Enable callback.
 	 */
-	public void onEnable ();
+	public void onEnable () throws PluginException;
 
 	/**
 	 * Disable callback.
 	 */
-	public void onDisable ();
+	public void onDisable () throws PluginException;
 }

@@ -71,13 +71,13 @@ public class AbstractPlugin implements IPlugin, ApplicationContextAware {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onEnable () { }
+	public void onEnable () throws PluginException { }
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onDisable () { }
+	public void onDisable () throws PluginException { }
 
 	/**
 	 * {@inheritDoc}
