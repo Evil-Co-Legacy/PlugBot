@@ -103,7 +103,7 @@ public class Bot implements Runnable, ApplicationContextAware {
 	/**
 	 * Stores the wrapper interface.
 	 */
-	@Autowired
+	@Autowired (required = false)
 	protected IWrapperInterface wrapperInterface;
 
 	/**
