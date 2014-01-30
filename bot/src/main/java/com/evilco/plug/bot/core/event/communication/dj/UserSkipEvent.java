@@ -23,7 +23,7 @@ public class UserSkipEvent extends ApiEvent {
 	/**
 	 * Constructs a new User Skip Event.
 	 * @param source
-	 * @param user
+	 * @param username
 	 */
 	// public UserSkipEvent (PageCommunicationAdapter source, User user) {
 	public UserSkipEvent (PageCommunicationAdapter source, String username) {
