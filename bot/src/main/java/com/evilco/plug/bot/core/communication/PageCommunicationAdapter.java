@@ -771,10 +771,12 @@ public class PageCommunicationAdapter {
 						break;
 					case USER_SKIP:
 						// deserialize data
-						user = gson.fromJson (eventData, User.class);
+						// user = gson.fromJson (eventData, User.class); // XXX: This is document as being an object
+						String skipUsername = gson.fromJson (eventData, String.class);
 
 						// construct event
-						event = new UserSkipEvent (this, user);
+						// event = new UserSkipEvent (this, user);
+						event = new UserSkipEvent (this, skipUsername);
 						break;
 					case VOTE_SKIP:
 						// construct event

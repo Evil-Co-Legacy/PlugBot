@@ -13,24 +13,39 @@ public class UserSkipEvent extends ApiEvent {
 	/**
 	 * Stores the user who skipped.
 	 */
-	protected User user = null;
+	// protected User user = null;
+
+	/**
+	 * Stores the username of the user which skipped.
+	 */
+	protected String username = null;
 
 	/**
 	 * Constructs a new User Skip Event.
 	 * @param source
 	 * @param user
 	 */
-	public UserSkipEvent (PageCommunicationAdapter source, User user) {
+	// public UserSkipEvent (PageCommunicationAdapter source, User user) {
+	public UserSkipEvent (PageCommunicationAdapter source, String username) {
 		super (source);
 
-		this.user = user;
+		// this.user = user;
+		this.username = username;
 	}
 
 	/**
 	 * Returns the user who skipped.
 	 * @return
 	 */
-	public User getUser () {
+	/* public User getUser () {
 		return this.user;
+	} */
+
+	/**
+	 * Returns the name of the user which skipped.
+	 * @return
+	 */
+	public String getUsername () {
+		return this.username;
 	}
 }
