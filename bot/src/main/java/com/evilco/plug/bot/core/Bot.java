@@ -101,6 +101,12 @@ public class Bot implements Runnable, ApplicationContextAware {
 	protected PageCommunicationAdapter pageCommunicationAdapter;
 
 	/**
+	 * Stores the wrapper interface.
+	 */
+	@Autowired
+	protected IWrapperInterface wrapperInterface;
+
+	/**
 	 * Constructs a new bot.
 	 */
 	public Bot () { }
@@ -279,5 +285,8 @@ public class Bot implements Runnable, ApplicationContextAware {
 		registry.destroySingleton ("eventManager");
 		registry.destroySingleton ("driver"); // This will automatically call close ()
 		registry.destroySingleton ("Bot");
+
+		// notify wrapper
+		if (this.wrapperInterface != null) this.wrapperInterface.onShutdown ();
 	}
 }
