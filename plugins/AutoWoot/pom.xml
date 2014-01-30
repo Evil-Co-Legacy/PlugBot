@@ -16,7 +16,7 @@
 
 	<!-- Artifact Metadata -->
 	<name>AutoWoot Plugin</name>
-	<description>let's the bot automatically woot on tracks.</description>
+	<description>Automatically woots tracks.</description>
 	<inceptionYear>2014</inceptionYear>
 
 	<!-- Organization Metadata -->
