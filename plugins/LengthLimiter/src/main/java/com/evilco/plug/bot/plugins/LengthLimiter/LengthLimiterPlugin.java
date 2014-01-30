@@ -51,6 +51,9 @@ public class LengthLimiterPlugin extends AbstractPlugin implements ApplicationLi
 
 		// load configuration
 		this.pluginConfiguration = PluginConfiguration.newInstance (this.getConfigurationFile ());
+
+		// save configuration
+		this.pluginConfiguration.save (this.getConfigurationFile ());
 	}
 
 	/**
@@ -62,7 +65,7 @@ public class LengthLimiterPlugin extends AbstractPlugin implements ApplicationLi
 		ICommandSender sender = new UserCommandSender (this.pageCommunicationAdapter, event.getUser ());
 
 		// check warning
-		if (event.getMedia ().duration > this.pluginConfiguration.warningLength) sender.sendMessage ("Please do not play tracks which are longer than " + (this.pluginConfiguration.warningLength / 60) + " minutes.");
+		if (event.getMedia ().duration > this.pluginConfiguration.warningLength) sender.sendMessage (String.format (this.pluginConfiguration.warningMessage, (this.pluginConfiguration.warningLength / 60)));
 
 		// check skip
 		if (event.getMedia ().duration > this.pluginConfiguration.skipLength) this.pageCommunicationAdapter.moderateForceSkip ();

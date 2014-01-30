@@ -21,7 +21,7 @@ import java.io.File;
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
 @XmlRootElement (name = "configuration", namespace = PluginConfiguration.NAMESPACE)
-@XmlType (propOrder = {"warningLength", "skipLength"})
+@XmlType (propOrder = {"warningLength", "skipLength", "warningMessage"})
 public class PluginConfiguration {
 
 	/**
@@ -40,6 +40,12 @@ public class PluginConfiguration {
 	 */
 	@XmlElement (name = "warningLength", namespace = NAMESPACE)
 	public int warningLength = 480;
+
+	/**
+	 * Defines the warning message.
+	 */
+	@XmlElement (name = "warningMessage", namespace = NAMESPACE)
+	public String warningMessage = "Please do not play tracks which are longer than %s minutes.";
 
 	/**
 	 * Protected constructor.
