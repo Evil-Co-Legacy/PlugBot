@@ -18,5 +18,6 @@
 		<module>launchwrapper</module>
 		<module>plugins/AutoWoot</module>
 		<module>plugins/LengthLimiter</module>
+		<module>plugins/HistoryCheck</module>
 	</modules>
 </project>
