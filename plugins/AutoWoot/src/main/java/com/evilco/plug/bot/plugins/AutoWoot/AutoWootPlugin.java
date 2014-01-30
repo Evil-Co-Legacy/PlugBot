@@ -5,7 +5,6 @@ import com.evilco.plug.bot.core.event.communication.dj.DjAdvanceEvent;
 import com.evilco.plug.bot.core.plugin.AbstractPlugin;
 import com.evilco.plug.bot.core.plugin.annotation.Plugin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
