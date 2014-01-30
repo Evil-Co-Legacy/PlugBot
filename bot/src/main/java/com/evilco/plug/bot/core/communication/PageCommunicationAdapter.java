@@ -854,7 +854,7 @@ public class PageCommunicationAdapter {
 	 * @param message
 	 */
 	public void sendChat (String message) {
-		this.getExecutor ().executeScript ("API.sendMessage (arguments[0]);", message);
+		this.getExecutor ().executeScript ("API.sendChat (arguments[0]);", message);
 	}
 
 	/**
