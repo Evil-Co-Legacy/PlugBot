@@ -1,12 +1,17 @@
 package com.evilco.plug.bot.launchwrapper;
 
 import com.evilco.plug.bot.core.Bot;
+import com.evilco.plug.bot.core.IWrapperInterface;
 import com.evilco.plug.bot.core.configuration.CoreBeanConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.shell.Bootstrap;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -15,7 +20,9 @@ import java.util.logging.Logger;
  * @auhtor Johannes Donath <johannesd@evil-co.com>
  * @copyright Copyright (C) 2014 Evil-Co <http://www.evil-co.org>
  */
-public class LaunchwrapperApplication {
+@Component
+@ComponentScan (basePackages = {"com.evilco.plug.bot.launchwrapper"})
+public class LaunchwrapperApplication implements ApplicationContextAware {
 
 	/**
 	 * Stores the internal logging instance.
@@ -28,6 +35,16 @@ public class LaunchwrapperApplication {
 	protected Bot bot = null;
 
 	/**
+	 * Stores the current bot context.
+	 */
+	protected AnnotationConfigApplicationContext botContext = null;
+
+	/**
+	 * Stores the application context.
+	 */
+	protected AnnotationConfigApplicationContext context = null;
+
+	/**
 	 * Stores the wrapper instance.
 	 */
 	protected static LaunchwrapperApplication instance = null;
@@ -38,29 +55,23 @@ public class LaunchwrapperApplication {
 	protected Thread thread = null;
 
 	/**
-	 * Constructs a new launchwrapper.
-	 * @param arguments
-	 */
-	private LaunchwrapperApplication (String[] arguments) {
-		// initiate first instance
-		this.initiateBot ();
-		this.thread.start ();
-
-		// start console
-		try {
-			Bootstrap.main (arguments);
-		} catch (IOException ex) {
-			this.shutdown ();
-		}
-	}
-
-	/**
 	 * Entry Point.
 	 * @param arguments
 	 */
 	public static void main (String[] arguments) {
-		// create new wrapper instance
-		instance = new LaunchwrapperApplication (arguments);
+		// create root context
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext ();
+
+		// register classes
+		context.register (LaunchwrapperApplication.class);
+		context.refresh ();
+
+		// start up by requesting the bean
+		context.getBean (LaunchwrapperApplication.class).initiateBot ();
+
+		try {
+			Bootstrap.main (arguments);
+		} catch (IOException ex) { }
 	}
 
 	/**
@@ -71,20 +82,26 @@ public class LaunchwrapperApplication {
 		if (this.bot != null || this.thread != null) return;
 
 		// create context
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext ();
+		this.botContext = new AnnotationConfigApplicationContext ();
 
 		// add core configuration
-		context.register (CoreBeanConfiguration.class);
-		context.refresh ();
+		this.botContext.setParent (this.context);
+		this.botContext.register (CoreBeanConfiguration.class);
+
+		// refresh context
+		this.botContext.refresh ();
 
 		// create new bot instance
-		this.bot = ((Bot) context.getBean ("Bot"));
+		this.bot = ((Bot) this.botContext.getBean ("Bot"));
 
 		// create new thread
 		this.thread = new BotThread (this.bot);
 
 		// register the error handler
 		this.thread.setUncaughtExceptionHandler ((new LaunchwrapperErrorHandler ()));
+
+		// start thread
+		this.thread.start ();
 	}
 
 	/**
@@ -116,6 +133,14 @@ public class LaunchwrapperApplication {
 
 		// end report
 		logger.severe ("========================================================================================");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setApplicationContext (ApplicationContext applicationContext) throws BeansException {
+		this.context = ((AnnotationConfigApplicationContext) applicationContext);
 	}
 
 	/**
