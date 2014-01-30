@@ -53,7 +53,7 @@ public class PluginClassLoader extends URLClassLoader {
 
 		// check size
 		if (plugins.size () == 0) throw new PluginLoaderException ("No plugin was found inside the plugin file.");
-		if (plugins.size () > 0) throw new PluginLoaderException ("The plugin contains more than one plugin definition.");
+		if (plugins.size () > 1) throw new PluginLoaderException ("The plugin contains more than one plugin definition.");
 
 		// find plugin
 		Class<?> tmpClass = plugins.iterator ().next ();
