@@ -613,6 +613,8 @@ public class PageCommunicationAdapter {
 						// decode
 						Message message = gson.fromJson (eventData, Message.class);
 
+						System.out.println (eventData);
+
 						// verify type
 						switch (message.type) {
 							case EMOTE:
@@ -624,17 +626,13 @@ public class PageCommunicationAdapter {
 							case SYSTEM:
 								event = new SystemMessageEvent (this, message);
 								break;
-							default:
-								// verify source
-								if (message.fromID == this.user.id) {
-									event = new BotMessageEvent (this, message);
-									break;
-								}
+							case MENTION:
+								// ignore our own mentions
+								if (message.fromID == this.getUser ().id) break;
 
 								// split up message
 								String[] messageEx = message.message.split (" ");
 
-								// check contents
 								if (messageEx.length >= 1 && messageEx[0].equalsIgnoreCase ("@" + this.user.username)) {
 									if (this.blacklistInteractionMap.containsKey (message.fromID) && this.blacklistInteractionMap.get (message.fromID) >= BLACKLIST_INTERACTION_AMOUNT) {
 										logger.info ("Ignored message from user " + message.from + " (" + message.fromID + "): User has been blacklisted for spamming.");
@@ -651,7 +649,7 @@ public class PageCommunicationAdapter {
 									ICommandSender sender = new UserCommandSender (this, this.getUser (message.fromID));
 
 									try {
-										this.commandManager.dispatch (sender, ((String[]) arguments.toArray ()));
+										this.commandManager.dispatch (sender, arguments);
 									} catch (CommandNotFoundException ex) {
 										sender.sendMessage ("Unknown command.");
 
@@ -668,6 +666,12 @@ public class PageCommunicationAdapter {
 									}
 
 									// stop execution
+									break;
+								}
+							default:
+								// verify source
+								if (message.fromID == this.user.id) {
+									event = new BotMessageEvent (this, message);
 									break;
 								}
 

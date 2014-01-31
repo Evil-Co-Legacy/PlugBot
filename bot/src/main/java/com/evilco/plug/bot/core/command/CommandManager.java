@@ -38,10 +38,7 @@ public class CommandManager {
 	 * @return
 	 * @throws CommandNotFoundException
 	 */
-	public boolean dispatch (ICommandSender sender, String[] commandEx) throws CommandNotFoundException {
-		// construct array list
-		ArrayList<String> arguments = new ArrayList<> (Arrays.asList (commandEx));
-
+	public boolean dispatch (ICommandSender sender, List<String> arguments) throws CommandNotFoundException {
 		// get alias
 		String alias = arguments.remove (0);
 

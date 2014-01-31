@@ -11,6 +11,8 @@ public enum MessageType {
 	MESSAGE,
 	@SerializedName ("emote")
 	EMOTE,
+	@SerializedName ("mention")
+	MENTION,
 	@SerializedName ("moderation")
 	MODERATION,
 	@SerializedName ("system")
