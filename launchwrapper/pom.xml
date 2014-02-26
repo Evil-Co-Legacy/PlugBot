@@ -208,27 +208,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- Assembly -->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-
-				<configuration>
-					<descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
-				</configuration>
-
-				<executions>
-					<execution>
-						<id>release</id>
-						<phase>package</phase>
-
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- Skip Deployment -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -248,7 +227,30 @@
 		<profile>
 			<id>release</id>
 
-			<!-- TODO -->
+			<build>
+				<plugins>
+					<!-- Assembly -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.4</version>
+
+						<configuration>
+							<descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
+						</configuration>
+
+						<executions>
+							<execution>
+								<id>release</id>
+								<phase>package</phase>
+
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>
