@@ -73,6 +73,18 @@
 		<tag>2.0</tag>
 	</scm>
 
+	<!-- Distribution -->
+	<distributionManagement>
+		<repository>
+			<id>evil-co</id>
+			<url>http://nexus.evil-co.org/content/repositories/free/</url>
+		</repository>
+		<snapshotRepository>
+			<id>evil-co</id>
+			<url>http://nexus.evil-co.org/content/repositories/free-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<!-- Build Repositories -->
 	<repositories>
 		<!-- Spring Framework -->
